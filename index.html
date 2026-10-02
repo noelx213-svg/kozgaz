@@ -1,0 +1,1561 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0f">
+<meta name="description" content="Közgazdaságtan fogalomtanuló app: 72 fogalom, Leitner ismétléssel, napi tanulótervvel és próbavizsgával.">
+<title>Közgazdaságtan Fogalomtanuló</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0a0f;
+  --bg2:#0f0f17;
+  --card:#14141f;
+  --card2:#1b1b29;
+  --line:#272739;
+  --txt:#f2f2f7;
+  --mut:#9a9ab0;
+  --acc:#7c3aed;
+  --acc2:#a78bfa;
+  --ok:#10b981;
+  --bad:#ef4444;
+  --warn:#f59e0b;
+  --info:#0ea5e9;
+  --r:16px;
+  --sh:0 10px 30px rgba(0,0,0,.45);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{
+  background:radial-gradient(1000px 600px at 50% -10%,#1b1430 0%,var(--bg) 55%) fixed;
+  color:var(--txt);
+  font-family:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  min-height:100vh;
+  padding-bottom:90px;
+  font-size:16px;
+  line-height:1.55;
+}
+.wrap{max-width:780px;margin:0 auto;padding:16px}
+h1,h2,h3{margin:0 0 10px;line-height:1.25}
+h1{font-size:22px;font-weight:800;letter-spacing:-.4px}
+h2{font-size:18px;font-weight:700}
+h3{font-size:15px;font-weight:700}
+p{margin:0 0 10px}
+button{font-family:inherit;font-size:15px;cursor:pointer;border:none;border-radius:12px}
+.hidden{display:none !important}
+
+/* ---------- top bar ---------- */
+.top{position:sticky;top:0;z-index:40;backdrop-filter:blur(14px);
+  background:rgba(10,10,15,.82);border-bottom:1px solid var(--line)}
+.top .inner{max-width:780px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+.brand{font-weight:800;font-size:15px;letter-spacing:-.3px;display:flex;align-items:center;gap:7px}
+.lvl{background:linear-gradient(135deg,var(--acc),var(--info));padding:3px 10px;border-radius:999px;font-size:12px;font-weight:800}
+.streak{margin-left:auto;font-size:13px;font-weight:700;color:var(--warn);display:flex;align-items:center;gap:4px}
+.xpbar{height:6px;background:#22223a;border-radius:99px;overflow:hidden;max-width:780px;margin:0 auto}
+.xpfill{height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2));transition:width .6s cubic-bezier(.2,.8,.2,1)}
+.xptxt{max-width:780px;margin:4px auto 0;padding:0 16px 8px;font-size:11px;color:var(--mut);display:flex;justify-content:space-between}
+
+/* ---------- cards ---------- */
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:14px;box-shadow:var(--sh)}
+.card.tight{padding:13px}
+.muted{color:var(--mut);font-size:13.5px}
+.tiny{font-size:12px;color:var(--mut)}
+.row{display:flex;gap:10px;align-items:center}
+.sb{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+
+/* ---------- buttons ---------- */
+.btn{background:var(--acc);color:#fff;padding:13px 18px;font-weight:700;width:100%;transition:transform .12s,filter .2s}
+.btn:active{transform:scale(.97)}
+.btn:hover{filter:brightness(1.1)}
+.btn.sec{background:var(--card2);border:1px solid var(--line);color:var(--txt)}
+.btn.ok{background:var(--ok)}
+.btn.bad{background:#3a2130;border:1px solid #512a39;color:#ffb4c4}
+.btn.ghost{background:transparent;border:1px solid var(--line);color:var(--mut)}
+.btn.sm{padding:9px 14px;font-size:13.5px;width:auto}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+
+/* ---------- module tiles ---------- */
+.mod{display:flex;gap:13px;align-items:flex-start;cursor:pointer;transition:transform .15s,border-color .2s}
+.mod:hover{transform:translateY(-2px);border-color:var(--acc)}
+.mod .em{font-size:26px;line-height:1}
+.ring{--p:0;width:46px;height:46px;border-radius:50%;flex:0 0 46px;
+  background:conic-gradient(var(--ok) calc(var(--p)*1%),#272739 0);
+  display:grid;place-items:center;font-size:11px;font-weight:800}
+.ring span{width:36px;height:36px;border-radius:50%;background:var(--card);display:grid;place-items:center}
+.bar{height:7px;background:#232338;border-radius:99px;overflow:hidden;margin-top:8px}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--ok),#34d399);transition:width .5s}
+
+/* ---------- learn / flashcard ---------- */
+.concept-name{font-size:21px;font-weight:800;letter-spacing:-.4px;margin-bottom:4px}
+.pill{display:inline-block;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:#241d3d;color:var(--acc2);margin-bottom:10px}
+.def{background:var(--card2);border-left:3px solid var(--acc);padding:12px 14px;border-radius:10px;margin:10px 0;font-size:15px}
+.blk{margin-top:12px}
+.blk .lbl{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--mut);margin-bottom:4px}
+.blk.ex{border-left:3px solid var(--info);padding-left:11px}
+.blk.tip{border-left:3px solid var(--warn);padding-left:11px}
+
+.flip{perspective:1400px;min-height:270px;margin-bottom:14px}
+.flip-in{position:relative;width:100%;min-height:270px;transition:transform .6s cubic-bezier(.3,.9,.3,1);transform-style:preserve-3d;cursor:pointer}
+.flip.on .flip-in{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;background:var(--card);border:1px solid var(--line);
+  border-radius:var(--r);padding:20px;display:flex;flex-direction:column;justify-content:center;box-shadow:var(--sh);overflow:auto}
+.face.back{transform:rotateY(180deg);background:linear-gradient(160deg,#17142a,#14141f)}
+
+/* ---------- quiz ---------- */
+.q{font-size:17px;font-weight:600;margin-bottom:14px;line-height:1.45}
+.opt{display:block;width:100%;text-align:left;background:var(--card2);border:1.5px solid var(--line);
+  color:var(--txt);padding:13px 15px;border-radius:12px;margin-bottom:9px;font-size:14.5px;transition:all .15s}
+.opt:hover:not(:disabled){border-color:var(--acc);transform:translateX(3px)}
+.opt.right{border-color:var(--ok);background:rgba(16,185,129,.14)}
+.opt.wrong{border-color:var(--bad);background:rgba(239,68,68,.12)}
+.fb{border-radius:12px;padding:13px 15px;margin-top:12px;font-size:14px;animation:up .3s ease}
+.fb.good{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.4)}
+.fb.bad{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.35)}
+.fb b{display:block;margin-bottom:5px}
+@keyframes up{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.prog{height:6px;background:#232338;border-radius:99px;overflow:hidden;margin-bottom:14px}
+.prog i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--info));transition:width .35s}
+
+/* ---------- plan ---------- */
+.day{display:flex;gap:11px;padding:11px 0;border-bottom:1px solid var(--line)}
+.day:last-child{border-bottom:none}
+.daynum{flex:0 0 42px;height:42px;border-radius:12px;background:var(--card2);display:grid;place-items:center;font-weight:800;font-size:13px}
+.day.done .daynum{background:rgba(16,185,129,.18);color:var(--ok)}
+.day.today .daynum{background:linear-gradient(135deg,var(--acc),var(--info));color:#fff}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;background:#232338;color:var(--mut);margin:3px 5px 0 0}
+
+/* ---------- stats ---------- */
+.stat{background:var(--card2);border-radius:12px;padding:12px;text-align:center}
+.stat b{display:block;font-size:20px;font-weight:800}
+.stat span{font-size:11px;color:var(--mut)}
+.badge{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);
+  padding:7px 11px;border-radius:99px;font-size:12.5px;font-weight:600;margin:0 6px 6px 0}
+.badge.off{opacity:.33}
+
+.clist{max-height:420px;overflow:auto}
+.citem{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.citem:last-child{border:none}
+.box{flex:0 0 26px;height:22px;border-radius:7px;display:grid;place-items:center;font-size:11px;font-weight:800;background:#232338;color:var(--mut)}
+.box.b1{background:rgba(239,68,68,.18);color:#fca5a5}
+.box.b2{background:rgba(245,158,11,.18);color:#fcd34d}
+.box.b3{background:rgba(14,165,233,.18);color:#7dd3fc}
+.box.b4,.box.b5{background:rgba(16,185,129,.18);color:#6ee7b7}
+
+/* ---------- bottom nav ---------- */
+.nav{position:fixed;bottom:0;left:0;right:0;background:rgba(14,14,22,.95);backdrop-filter:blur(14px);
+  border-top:1px solid var(--line);z-index:50;padding-bottom:env(safe-area-inset-bottom)}
+.nav .inner{max-width:780px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+.nav button{background:none;padding:9px 2px 11px;color:var(--mut);font-size:10.5px;font-weight:600;
+  display:flex;flex-direction:column;align-items:center;gap:3px;border-radius:0}
+.nav button .i{font-size:19px;line-height:1}
+.nav button.on{color:var(--acc2)}
+
+/* ---------- misc ---------- */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:86px;background:var(--card2);
+  border:1px solid var(--acc);padding:11px 18px;border-radius:99px;font-weight:700;font-size:14px;
+  z-index:99;box-shadow:var(--sh);animation:pop .3s ease}
+@keyframes pop{from{opacity:0;transform:translate(-50%,14px)}to{opacity:1;transform:translate(-50%,0)}}
+.center{text-align:center}
+input[type=date],select{background:var(--card2);border:1px solid var(--line);color:var(--txt);
+  padding:10px 12px;border-radius:10px;font-family:inherit;font-size:14px;width:100%}
+@media(max-width:420px){
+  h1{font-size:20px}
+  .concept-name{font-size:19px}
+  .grid3{grid-template-columns:1fr 1fr}
+}
+
+</style>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+</head>
+<body>
+
+<header class="top">
+  <div class="inner">
+    <div class="brand">📈 Közgazdaságtan <span class="lvl" id="lvl">Szint 1</span></div>
+    <div class="streak" id="streak">🔥 0</div>
+  </div>
+  <div class="xpbar"><div class="xpfill" id="xpfill" style="width:0%"></div></div>
+  <div class="xptxt"><span id="xpnow">0 XP</span><span id="xpnext"></span></div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="nav">
+  <div class="inner">
+    <button data-v="home" class="on" onclick="nav('home')"><span class="i">🏠</span>Főoldal</button>
+    <button data-v="plan" onclick="nav('plan')"><span class="i">🗓️</span>Terv</button>
+    <button data-v="flash" onclick="nav('flash',{ids:allIds(),i:0})"><span class="i">🃏</span>Kártyák</button>
+    <button data-v="quiz" onclick="nav('quiz')"><span class="i">🎯</span>Kvíz</button>
+    <button data-v="prog" onclick="nav('prog')"><span class="i">📊</span>Haladás</button>
+  </div>
+</nav>
+
+<script>
+// 1. modul: Közgazdaságtan alapfogalmai (17 fogalom)
+window.MODULES = [
+  {
+    id: "m1",
+    num: 1,
+    emoji: "📘",
+    title: "Közgazdaságtan alapfogalmai",
+    desc: "Szűkösség, szükségletek, erőforrások, gazdasági körforgás, modellezés és a klasszikus logikai hibák.",
+    color: "#7c3aed"
+  },
+  {
+    id: "m2",
+    num: 2,
+    emoji: "⚖️",
+    title: "Munkamegosztás és piac",
+    desc: "A munkamegosztástól a cserén és a pénzen át a keresletig, kínálatig és a piaci egyensúlyig.",
+    color: "#0ea5e9"
+  },
+  {
+    id: "m3",
+    num: 3,
+    emoji: "📈",
+    title: "Rugalmasság",
+    desc: "Ár, kereszt és jövedelemrugalmasság, valamint a normál, inferior és luxus javak.",
+    color: "#f59e0b"
+  }
+];
+
+window.CONCEPTS = (window.CONCEPTS || []).concat([
+  {
+    id: "kozgazdasagtan",
+    m: "m1",
+    name: "Közgazdaságtan",
+    short: "Azt tanulmányozza, hogyan használjuk a szűkösen rendelkezésre álló erőforrásainkat javak előállítására és szolgáltatások nyújtására, hogyan osztjuk el ezeket, hogy a társadalom tagjainak szükségletei kielégüljenek.",
+    long: "Három kérdés köré épül: mit termeljünk, hogyan termeljük, és kinek jusson belőle. Mindhárom kérdés azért létezik egyáltalán, mert az erőforrások szűkösek. Ha minden korlátlanul állna rendelkezésre, nem lenne mit vizsgálni.",
+    example: "Egy ország eldönti, hogy a költségvetésből kórházat vagy autópályát épít. Mindkettőre nincs pénz, választani kell, és ez a választás közgazdasági kérdés.",
+    tip: "A definíció magja: szűkös erőforrás, javak és szolgáltatások, elosztás, szükséglet-kielégítés. Ha ezt a négyet elmondod, megvan a pont.",
+    confuse: ["szukosseg", "javak"]
+  },
+  {
+    id: "szukosseg",
+    m: "m1",
+    name: "Szűkösség",
+    short: "Az erőforrások, javak olyan mennyiségi és minőségi állapota, amikor azok a társadalom és a gazdaság igényeihez képest nem elegendőek, ugyanakkor van lehetőség eldönteni, hogy mit, hogyan és kinek termeljenek.",
+    long: "A szűkösség nem azonos a szegénységgel. Akkor is szűkösség van, ha sok minden rendelkezésre áll, de kevesebb, mint amennyit a szükségletek igényelnének. Ez a közgazdaságtan létének az oka.",
+    example: "Egy nap 24 órából áll. Akármennyire gazdag valaki, az idejét be kell osztania tanulás, munka és pihenés között.",
+    tip: "Kulcsszó a viszonyítás: nem abszolút kevés, hanem az igényekhez képest kevés.",
+    confuse: ["eroforrasok", "szuksegletek"]
+  },
+  {
+    id: "szuksegletek",
+    m: "m1",
+    name: "Szükségletek",
+    short: "Anyagi javak és szolgáltatások iránti igény, hiányérzet, amely cselekvést vált ki önmaga megszüntetésére.",
+    long: "A szükséglet tehát hiányérzet plusz cselekvési késztetés. Nem elég érezni a hiányt, a szükséglet arra is rávesz, hogy tegyünk érte. A szükségletek folyamatosan megújulnak, ezért ismétlődik a gazdasági körforgás.",
+    example: "Megéhezel (hiányérzet), ezért elmész a boltba és veszel valamit (cselekvés).",
+    tip: "Definícióban mindig legyen benne a hiányérzet és az, hogy cselekvést vált ki. Ez a kettő különbözteti meg a puszta vágytól.",
+    confuse: ["javak", "szukosseg"]
+  },
+  {
+    id: "javak",
+    m: "m1",
+    name: "Javak",
+    short: "A gazdasági szükségletek kielégítésének eszközei.",
+    long: "A javak kézzelfogható, tárgyiasult formában elégítik ki a szükségleteket, szemben a szolgáltatásokkal, amelyek maguk a tevékenységek. A javakat erőforrások felhasználásával állítjuk elő.",
+    example: "Kenyér, cipő, telefon, lakás.",
+    tip: "A javak az eszköz, a szükséglet a cél. A kettő iránya ne cserélődjön fel a definícióban.",
+    confuse: ["szolgaltatasok", "szuksegletek", "aru"]
+  },
+  {
+    id: "szolgaltatasok",
+    m: "m1",
+    name: "Szolgáltatások",
+    short: "Olyan tevékenység, amely közvetlenül elégít ki valamilyen szükségletet, és amelynél a termelés és a fogyasztás térben és időben nem különül el.",
+    long: "A legfontosabb megkülönböztető jegy az egyidejűség: a szolgáltatás akkor fogy, amikor keletkezik, ezért nem raktározható és nem szállítható el későbbre.",
+    example: "Fodrász, tanári óra, koncert. Amíg a fodrász vág, te már fogyasztod is a szolgáltatást.",
+    tip: "Vizsgán a kulcsmondat: a termelés és a fogyasztás térben és időben nem különül el.",
+    confuse: ["javak"]
+  },
+  {
+    id: "eroforrasok",
+    m: "m1",
+    name: "Erőforrások (termelési tényezők)",
+    short: "Olyan speciális inputok, amelyek segítségével javakat termelünk és szolgáltatásokat nyújtunk, és amelyek nem használódnak el egyetlen termelési folyamatban.",
+    long: "Másik nevük termelési tényezők. A lényeg, hogy több termelési cikluson át szolgálnak, tehát nem tűnnek el egyetlen felhasználással, ellentétben a sima nyersanyaggal.",
+    example: "Egy varrógép több ezer ruha elkészítésében vesz részt, nem használódik el az első darabnál.",
+    tip: "A definíció két fele: inputok a termeléshez, plusz nem használódnak el egy folyamatban. A második félmondat szokott lemaradni.",
+    confuse: ["javak", "szukosseg"]
+  },
+  {
+    id: "gazdasagi-szereplok",
+    m: "m1",
+    name: "Gazdasági szereplők",
+    short: "A gazdaság szervezeti struktúráját alkotó alapegységek: háztartás, üzleti szervezetek (vállalat), állam (kormányzat) és külföld.",
+    long: "Négy szereplő van, ezt érdemes pontosan tudni. A háztartás fogyaszt és erőforrást kínál, a vállalat termel, az állam szabályoz és újraeloszt, a külföld pedig a külkereskedelmi kapcsolatokon keresztül kapcsolódik be.",
+    example: "Egy magyar család (háztartás) vásárol egy magyar gyártótól (vállalat), aki áfát fizet az államnak, és exportál Németországba (külföld).",
+    tip: "Négy szereplő, mindig négy. Háztartás, vállalat, állam, külföld.",
+    confuse: ["gazdasagi-korforgas", "gazdasagi-rendszerek"]
+  },
+  {
+    id: "gazdasagi-korforgas",
+    m: "m1",
+    name: "Gazdasági körforgás",
+    short: "A gazdasági körforgás folyamatos, szakadatlan ismétlődését újratermelésnek nevezzük, amely magába foglalja az állandóan megújuló szükségletek kielégítését, a termékek és szolgáltatások folyamatos termelését és a gazdasági szereplők közötti kapcsolatok ismétlődését.",
+    long: "A körforgás azért kör, mert a szereplők között a javak és a pénz ellentétes irányban, folyamatosan áramlanak, és a folyamat újraindul. Az ismétlődő változatát hívjuk újratermelésnek.",
+    example: "A háztartás munkát ad a vállalatnak, a vállalat bért fizet, a háztartás ebből vásárol a vállalattól, a vállalat ebből újra termel.",
+    tip: "A fogalom kulcsszava az ismétlődés és az újratermelés.",
+    confuse: ["gazdasagi-rendszerek", "gazdasagi-szereplok"]
+  },
+  {
+    id: "gazdasagi-rendszerek",
+    m: "m1",
+    name: "Gazdasági rendszerek",
+    short: "A gazdasági szereplők között kialakuló kapcsolatok összessége, a gazdasági körforgás megvalósulásának mechanizmusa.",
+    long: "A munkamegosztás miatt elkülönült termelők és munkavállalók tevékenységét össze kell hangolni. Erre a történelem során különböző koordinációs mechanizmusok épültek ki, ezeket hívjuk gazdasági rendszereknek.",
+    example: "Piacgazdaság, tervgazdaság, vegyes gazdaság.",
+    tip: "A rendszer a mechanizmus, a körforgás maga a folyamat. A rendszer az, amiben a körforgás lezajlik.",
+    confuse: ["gazdasagi-korforgas", "piaci-mechanizmus"]
+  },
+  {
+    id: "emberek-kozotti-interakcio",
+    m: "m1",
+    name: "Emberek közötti interakció",
+    short: "A gazdaságban az emberek között lezajló, kölcsönös, egymáshoz viszonyított viselkedés.",
+    long: "A gazdasági döntések sosem légüres térben születnek: mindig figyelembe vesszük mások várható viselkedését, és a mi döntésünk is hat rájuk.",
+    example: "Egy bolt azért nem emel árat, mert tudja, hogy a vevők átmennének a szomszéd üzletbe.",
+    tip: "Kulcsszavak: kölcsönös, egymáshoz viszonyított viselkedés.",
+    confuse: ["gazdasagi-szereplok"]
+  },
+  {
+    id: "modell",
+    m: "m1",
+    name: "Modell",
+    short: "A valóság leegyszerűsített megjelenítése, amelyet azért alkotunk, hogy megértsük, magyarázzuk és előre jelezzük a gazdasági jelenségeket.",
+    long: "A modell szándékosan egyszerűsít, elhagyja a lényegtelen részleteket. Pontosan ettől használható: ha mindent tartalmazna, ugyanolyan átláthatatlan lenne, mint maga a valóság.",
+    example: "A termelési lehetőségek görbéje csak két terméket vizsgál, pedig a gazdaságban több millió termék van.",
+    tip: "Három cél: megértés, magyarázat, előrejelzés. A definícióban mondd el mindhármat.",
+    confuse: ["valtozok", "ceteris-paribus"]
+  },
+  {
+    id: "valtozok",
+    m: "m1",
+    name: "Változók",
+    short: "A gazdasági modell azon tényezői, amelyek leírják a modellt, megmagyarázzák a modell működését és meghatározzák annak különböző állapotait.",
+    long: "A változók a modell mozgó alkatrészei. Megkülönböztetünk független változót (amit változtatunk) és függő változót (ami emiatt változik).",
+    example: "A keresleti függvényben az ár a független változó, a keresett mennyiség a függő változó.",
+    tip: "A változó a modellhez tartozik, nem a valósághoz. Ez a kettő együtt jár a vizsgán.",
+    confuse: ["modell", "ceteris-paribus"]
+  },
+  {
+    id: "ceteris-paribus",
+    m: "m1",
+    name: "Ceteris paribus",
+    short: "Azt jelenti, hogy csak egy tényezőt változtatunk, miközben a többi tényezőt változatlanul hagyjuk.",
+    long: "Elemzési fogás: így tudjuk izolálni egyetlen tényező hatását. Enélkül sosem derülne ki, hogy egy változás pontosan minek köszönhető.",
+    example: "Ha az ár nő, a keresett mennyiség csökken, feltéve hogy a jövedelem, a divat és a többi termék ára közben nem változik.",
+    tip: "Magyarul: minden más változatlansága mellett. Majdnem minden keresleti és kínálati tételben ott van.",
+    confuse: ["modell", "csokkeno-kereslet-torvenye"]
+  },
+  {
+    id: "termelesi-lehetosegek-gorbeje",
+    m: "m1",
+    name: "Termelési lehetőségek görbéje (transzformációs görbe)",
+    short: "Adott technológia mellett megmutatja két termék azon mennyiségi kombinációit, amelyeket adott tőke és munkamennyiség maximális felhasználásával tudunk előállítani.",
+    long: "A görbén lévő pontok a hatékony termelést jelentik, a görbe alatti pontok a kihasználatlan kapacitást, a görbén kívüli pontok pedig jelenleg elérhetetlenek. Az egyik termékből csak úgy lehet többet gyártani, ha a másikból kevesebbet.",
+    example: "Egy ország ágyút vagy vajat gyárt. Ha több ágyút akar, kevesebb vaj jut.",
+    tip: "Három feltétel a definícióban: két termék, adott technológia, az erőforrások maximális felhasználása.",
+    confuse: ["pareto-hatekonysag", "szukosseg"]
+  },
+  {
+    id: "pareto-hatekonysag",
+    m: "m1",
+    name: "Pareto hatékonyság",
+    short: "A gazdaság akkor működik Pareto hatékonyan, ha nem lehet senki jólétét fokozni anélkül, hogy valaki más ne kerülne kedvezőtlenebb helyzetbe.",
+    long: "Ez a hatékonyság mércéje, nem az igazságosságé. Egy nagyon egyenlőtlen elosztás is lehet Pareto hatékony, ha nincs olyan átrendezés, amely valakinek jobb lenne anélkül, hogy másnak rosszabb.",
+    example: "Ha egy tortát maradéktalanul felosztottunk, már senkinek nem adhatsz több szeletet úgy, hogy mástól ne vegyél el.",
+    tip: "Gyakori hiba azt mondani, hogy a Pareto hatékonyság igazságos elosztást jelent. Nem jelent.",
+    confuse: ["termelesi-lehetosegek-gorbeje"]
+  },
+  {
+    id: "osszetetel-csapdaja",
+    m: "m1",
+    name: "Összetétel csapdája",
+    short: "Az a tévedés, amikor azt gondoljuk, hogy ha valami igaz egy rendszer egy részére, akkor igaz az egészére is, holott az egész gyakran különbözik a részek összegétől.",
+    long: "Tankönyvi példája: ha egy agrárvállalkozó gyümölcstermelése átlagon felüli, kiemelkedő bevételhez jut. Ha viszont abban az évben minden gazdálkodónak kiemelkedő a termése, az agrárjövedelmek csökkennek, mert lenyomja az árakat a bőséges kínálat.",
+    example: "Ha egy néző feláll a stadionban, jobban lát. Ha mindenki feláll, senki nem lát jobban.",
+    tip: "Rész és egész viszonya. Ne keverd a post hoc tévedéssel, ami időbeli sorrendről szól.",
+    confuse: ["post-hoc-tevedes"]
+  },
+  {
+    id: "post-hoc-tevedes",
+    m: "m1",
+    name: "Post hoc tévedés",
+    short: "Oksági kapcsolat elvétése: egy későbbi eseményt az időben őt megelőző esemény következményének tekintünk pusztán azért, mert azok egymást követik.",
+    long: "Az időbeli egymásutániság önmagában nem bizonyít okságot. Lehet, hogy véletlen egybeesés, vagy egy harmadik, rejtett tényező okozza mindkettőt.",
+    example: "Nő a fagylaltfogyasztás, és nő a vízbefulladások száma. Nem a fagylalt okozza, hanem a nyári meleg mindkettőt.",
+    tip: "Post hoc = utána, tehát miatta. Ez az időbeli hiba, az összetétel csapdája a rész és egész hiba.",
+    confuse: ["osszetetel-csapdaja"]
+  }
+]);
+
+// 2. modul: Munkamegosztás és piac (41 fogalom)
+window.CONCEPTS = (window.CONCEPTS || []).concat([
+  {
+    id: "munkamegosztas",
+    m: "m2",
+    name: "Munkamegosztás",
+    short: "Az emberi tevékenységek szétválása, specializálódása különböző szakmákká és foglalkozásokká.",
+    long: "A munkamegosztás a gazdasági fejlődés következménye, a fokát a gazdaság fejlettsége határozza meg. Három alaptípusa van: természetes, technikai és társadalmi munkamegosztás.",
+    example: "Az egyik ember cipőt készít, a másik gabonát termeszt, és elcserélik egymással a termékeiket.",
+    tip: "Jegyezd meg a három alaptípust: természetes, technikai, társadalmi. Ezen kívül létezik horizontális és vertikális bontás is.",
+    confuse: ["kooperacio", "tarsadalmi-munkamegosztas"]
+  },
+  {
+    id: "termeszetes-munkamegosztas",
+    m: "m2",
+    name: "Természetes munkamegosztás",
+    short: "A gazdasági tevékenységek nem, kor és testi erő szerinti specializációja, ahol a tevékenységek elkülönülése fiziológiai és biológiai alapon történik.",
+    long: "Ez a legrégebbi forma, az őskori közösségekben jelent meg, amikor a feladatokat a testi adottságok osztották szét.",
+    example: "Az ősi közösségben a fizikailag erősebbek vadásztak, mások gyűjtögettek.",
+    tip: "Kulcsszó: fiziológiai, biológiai alap. Nem, kor, testi erő.",
+    confuse: ["technikai-munkamegosztas", "tarsadalmi-munkamegosztas"]
+  },
+  {
+    id: "technikai-munkamegosztas",
+    m: "m2",
+    name: "Technikai munkamegosztás",
+    short: "A gazdasági tevékenységek olyan specializációja, ahol a szétválás alapját az anyagi-technikai feltételek, a termelési eszközök különbözősége adja.",
+    long: "Itt nem az ember adottsága, hanem a használt eszköz és technológia dönti el, ki mit csinál.",
+    example: "Az esztergályos, a hegesztő és a festő azért külön szakma, mert más gépet és más technológiát használnak.",
+    tip: "Kulcsszó: eszközök, technikai feltételek különbözősége.",
+    confuse: ["termeszetes-munkamegosztas", "tarsadalmi-munkamegosztas"]
+  },
+  {
+    id: "tarsadalmi-munkamegosztas",
+    m: "m2",
+    name: "Társadalmi munkamegosztás",
+    short: "Az emberek, embercsoportok olyan szétválása, amely a társadalmi helyzetüket differenciálja.",
+    long: "Itt a munkamegosztás nemcsak feladatokat oszt szét, hanem társadalmi rétegeket, státuszkülönbségeket is létrehoz.",
+    example: "A szellemi és a fizikai munkát végzők elkülönülése, illetve az ebből fakadó eltérő társadalmi helyzet.",
+    tip: "Kulcsszó: a társadalmi helyzetet differenciálja. Ez különbözteti meg a másik kettőtől.",
+    confuse: ["technikai-munkamegosztas", "termeszetes-munkamegosztas"]
+  },
+  {
+    id: "horizontalis-munkamegosztas",
+    m: "m2",
+    name: "Horizontális munkamegosztás",
+    short: "A munkamegosztás azonos szintjén lévő termelők kooperációja.",
+    long: "Ugyanazon a termelési szinten lévő szereplők osztják fel egymás között a munkafázisokat.",
+    example: "Három cipőgyár fog össze: az egyik csak a talpakat, a másik csak a felsőrészeket készíti, a harmadik ezeket összeállítja.",
+    tip: "Horizontális = azonos szint, egymás mellett. Vertikális = egymás fölötti szintek.",
+    confuse: ["vertikalis-munkamegosztas", "kooperacio"]
+  },
+  {
+    id: "vertikalis-munkamegosztas",
+    m: "m2",
+    name: "Vertikális munkamegosztás",
+    short: "A munkamegosztás különböző szintjein lévő szereplők kooperációja.",
+    long: "A termelési lánc egymás utáni szakaszai kapcsolódnak össze, a nyersanyagtól a végső fogyasztóig.",
+    example: "A mezőgazdasági termelő kooperál a felvásárló élelmiszer-feldolgozóval, aki összefog egy kereskedelmi vállalkozással, így a mezőtől az asztalig átfogják a termelési vertikumot.",
+    tip: "Gondolj a mezőtől az asztalig láncra, ez mindig a vertikális.",
+    confuse: ["horizontalis-munkamegosztas"]
+  },
+  {
+    id: "kooperacio",
+    m: "m2",
+    name: "Kooperáció",
+    short: "A munkamegosztás alapján elkülönült termelők tudatos együttműködése.",
+    long: "A munkamegosztás szétválaszt, a kooperáció pedig visszakapcsolja a szétvált tevékenységeket. A kulcsszó a tudatosság.",
+    example: "Két beszállító és egy összeszerelő üzem előre egyeztetett ütemterv szerint dolgozik együtt.",
+    tip: "Munkamegosztás = szétválás, kooperáció = tudatos együttműködés. Egymás párjai.",
+    confuse: ["munkamegosztas", "horizontalis-munkamegosztas"]
+  },
+  {
+    id: "konkret-munka",
+    m: "m2",
+    name: "Konkrét munka",
+    short: "Minőségi különbségek a tevékenység során: más nyersanyag és más eszközhasználat más végeredményt hoz létre.",
+    long: "A konkrét munka az, ami a használati értéket létrehozza, hiszen minden konkrét munka más terméket eredményez.",
+    example: "A cipőtermelő munka cipőt, a gabonatermelő munka gabonát, a hústermelő munka húst hoz létre.",
+    tip: "Konkrét munka = használati érték. Absztrakt munka = érték. Ez a párosítás a vizsgakérdés lényege.",
+    confuse: ["absztrakt-munka", "hasznalati-ertek"]
+  },
+  {
+    id: "absztrakt-munka",
+    m: "m2",
+    name: "Absztrakt (elvont) munka",
+    short: "Minőségi különbségektől megfosztott tevékenység, az agy és az izom általános erőkifejtése.",
+    long: "Ha eltekintünk attól, hogy a munka mit hoz létre, csak az marad, hogy emberi energiát fektettünk bele. Ez teszi összehasonlíthatóvá a legkülönbözőbb munkákat, és ez alapozza meg az értéket.",
+    example: "A cipész és a pék munkája a konkrét tartalmát tekintve teljesen más, de mindkettő emberi energiaráfordítás, és ezen az alapon összemérhető.",
+    tip: "Absztrakt = elvonatkoztatunk a minőségtől. Agy és izom általános erőkifejtése, ez a tankönyvi fordulat.",
+    confuse: ["konkret-munka", "ertek", "munkaertek-elmelet"]
+  },
+  {
+    id: "aru",
+    m: "m2",
+    name: "Áru",
+    short: "Olyan jószág, amelyet cserére termelnek.",
+    long: "Nem minden jószág áru. Csak az, amit nem saját fogyasztásra, hanem eladásra, cserére állítanak elő. Az árunak két oldala van: használati érték és érték.",
+    example: "A kertedben magadnak termelt paradicsom jószág. Ha kiviszed a piacra eladni, áruvá válik.",
+    tip: "Egyetlen kulcsszó dönt: cserére termelik. Enélkül csak jószág.",
+    confuse: ["javak", "hasznalati-ertek"]
+  },
+  {
+    id: "hasznalati-ertek",
+    m: "m2",
+    name: "Használati érték",
+    short: "Az áru egyik jellemzője: a hasznos tulajdonságok összessége, amely alkalmassá teszi a szükséglet-kielégítésre.",
+    long: "Ez az áru konkrét, fizikai hasznossága. A konkrét munka hozza létre. Használati érték nélkül nincs vevő, hiszen senki nem vesz meg olyasmit, ami semmire nem jó.",
+    example: "A cipő használati értéke, hogy védi a lábat és lehet benne járni.",
+    tip: "Használati érték = mire jó. Csereérték = mennyiért cserélhető. Ez a két oldal az áru két arca.",
+    confuse: ["csereertek", "ertek", "konkret-munka"]
+  },
+  {
+    id: "csereertek",
+    m: "m2",
+    name: "Csereérték",
+    short: "Két dolog azon mennyiségi aránya, amely alapján elcserélődnek egymással.",
+    long: "A csereérték mindig arány, tehát viszonyszám. A közgazdaságtan különböző iskolái eltérően magyarázzák a mögötte álló tartalmat, például a hasznosság-elmélet és a munkaérték-elmélet.",
+    example: "Ha 1 pár cipőt 50 kg gabonára cserélnek, akkor ez a cipő csereértéke gabonában kifejezve.",
+    tip: "Csereérték = mennyiségi arány. Az érték ennek az absztrakciója, az ár pedig a pénzben kifejezett formája.",
+    confuse: ["ertek", "ar", "hasznalati-ertek"]
+  },
+  {
+    id: "ertek",
+    m: "m2",
+    name: "Érték",
+    short: "A csereértékek sokaságából nyert elvont (absztrakt) fogalom: ha két árut szokásosan el lehet cserélni egymással, akkor azonos az értékük.",
+    long: "Az érték nem egy konkrét cserearány, hanem az, ami a sok-sok cserearány mögött közös. Ezért absztrakt fogalom.",
+    example: "Ha a cipő ugyanannyi gabonára, ugyanannyi húsra és ugyanannyi szövetre cserélhető, mint egy másik termék, akkor a kettő értéke azonos.",
+    tip: "Csereérték = a konkrét arány. Érték = a sok arányból elvont közös tartalom.",
+    confuse: ["csereertek", "munkaertek-elmelet", "hasznalati-ertek"]
+  },
+  {
+    id: "munkaertek-elmelet",
+    m: "m2",
+    name: "Munkaérték-elmélet",
+    short: "Az érték az áru tulajdonosai közötti viszony, amelyben az áru előállítására fordított munkájukat egyenlőnek ismerik el. Ilyen értelemben az érték mennyisége az áru előállításához társadalmilag szükséges munka mennyisége.",
+    long: "Nem az számít, hogy egy konkrét termelő mennyit vacakolt az adott darabbal, hanem az, hogy az adott technológiai szinten átlagosan mennyi munka kell hozzá.",
+    example: "Ha egy lassú asztalos háromszor annyi idő alatt készít el egy széket, mint az átlag, a széke akkor sem lesz háromszor értékesebb.",
+    tip: "A kulcsfordulat: társadalmilag szükséges munkamennyiség. Ez a szó, hogy társadalmilag, mindig maradjon benne.",
+    confuse: ["ertek", "absztrakt-munka", "csereertek"]
+  },
+  {
+    id: "egyenertekes",
+    m: "m2",
+    name: "Egyenértékes",
+    short: "Az az áru, amit a felkínált áru tulajdonosa elfogad a saját árujáért cserébe. Általános egyenértékes az, amelyet a piac minden eladója elfogad egyenértékesként.",
+    long: "Az általános egyenértékes kialakulása vezet el a pénzhez: ha mindenki elfogad egy bizonyos árut, akkor az válik a csere egyetemes közvetítőjévé.",
+    example: "Korábban a só, a kagyló vagy az arany töltött be általános egyenértékes szerepet.",
+    tip: "Egyenértékes = amit én elfogadok. Általános egyenértékes = amit mindenki elfogad, ebből lesz a pénz.",
+    confuse: ["penz", "csereertek"]
+  },
+  {
+    id: "egyszeru-veletlen-csere",
+    m: "m2",
+    name: "Egyszerű, véletlen csere",
+    short: "Amikor az áruk (javak) birtokosai azokat alkalomszerűen akarják elcserélni, mert a birtokukban lévő jószágból feleslegük mutatkozik, de szükségük lenne egy másik jószágra.",
+    long: "A csere legkorábbi formája. Nem cserére termelnek, hanem véletlenül keletkező feleslegtől szabadulnak meg.",
+    example: "Egy törzsnek véletlenül több bőre maradt, mint amennyire szüksége van, és elcseréli a szomszéd törzs felesleges gabonájára.",
+    tip: "Kulcsszavak: alkalomszerű, felesleg. A kifejlett csere ennek az ellentéte.",
+    confuse: ["kifejlett-csere", "egyszeru-arutermeles"]
+  },
+  {
+    id: "kifejlett-csere",
+    m: "m2",
+    name: "Kifejlett csere",
+    short: "A cserének az a szakasza és formája, amikor a kialakult munkamegosztásra támaszkodva már tudatosan és célszerűen, kifejezetten cserére termelik a jószágokat és állítják elő a szolgáltatásokat.",
+    long: "Itt a csere már nem véletlen, hanem a termelés eleve a cserére irányul. Ez az árutermelés alapja.",
+    example: "Egy cipész nem azért készít száz pár cipőt, mert feleslege keletkezett, hanem mert eleve eladni akarja mindet.",
+    tip: "Kulcsszavak: tudatosan, célszerűen, kifejezetten cserére.",
+    confuse: ["egyszeru-veletlen-csere", "egyszeru-arutermeles", "aru"]
+  },
+  {
+    id: "egyszeru-arutermeles",
+    m: "m2",
+    name: "Egyszerű (kis)árutermelés",
+    short: "Az árutermelés térhódításának az a lépcsőfoka, amikor a tulajdonos maga is dolgozott, és a tulajdon saját munkán alapult.",
+    long: "Nincs bérmunka, a termelőeszköz tulajdonosa maga a dolgozó. Ezért hívják kisárutermelésnek.",
+    example: "A céhes mester a saját műhelyében, saját szerszámaival, saját kezével dolgozik.",
+    tip: "Kulcsmondat: a tulajdon saját munkán alapult, a tulajdonos maga is dolgozott.",
+    confuse: ["kifejlett-csere"]
+  },
+  {
+    id: "penz",
+    m: "m2",
+    name: "Pénz",
+    short: "A csere közvetítője, az áruk és szolgáltatások vásárlására használt fizetési eszköz.",
+    long: "Szűken vett értelemben a gazdasági életben készpénz (érme és papírpénz) vagy folyószámlapénz formájában jelenik meg. A közgazdászok közül sokan a gazdaság kenőanyagának tekintik.",
+    example: "Nem kell megtalálnod azt, aki pont a te cipődre vágyik és pont gabonát ad érte: eladod pénzért, és veszel bármit.",
+    tip: "A tankönyvi hasonlat: a gazdaság kenőanyaga. Megjegyzendő a két megjelenési forma is: készpénz és folyószámlapénz.",
+    confuse: ["egyenertekes", "ar"]
+  },
+  {
+    id: "piac",
+    m: "m2",
+    name: "Piac",
+    short: "A csere történelmi színtere, ahol az adás-vétel lebonyolódik. Bővebben: olyan mechanizmus, amelynek keretében a vevők és az eladók kapcsolatba lépnek egymással, termékeket, szolgáltatásokat és különféle aktívákat cserélnek, és közben meghatározzák ezek árait.",
+    long: "Földrajzi értelemben lehet helyi, regionális, országos és nemzetközi piac. A csere tárgya szerint árupiacot, erőforráspiacot és pénzpiacot különböztetünk meg.",
+    example: "A zöldségpiac, a tőzsde és egy webshop egyaránt piac, mert mindegyikben vevő és eladó találkozik és ár alakul ki.",
+    tip: "Két bontást tudj: földrajzi (helyi, regionális, országos, nemzetközi) és a csere tárgya szerinti (áru, erőforrás, pénz).",
+    confuse: ["piaci-mechanizmus", "piaci-ar"]
+  },
+  {
+    id: "ar",
+    m: "m2",
+    name: "Ár",
+    short: "Az áru vagy szolgáltatás értékének pénzben kifejezett formája, a csereérték sajátságos megjelenési formája, mert az áruért cserébe ajánlott áru maga a pénz.",
+    long: "Az ár a termelői és fogyasztói döntések összehangolásának eszköze. A magasabb árak rendszerint ösztönzik a termelést, de csökkentik a fogyasztók vásárlásait, az alacsonyabb árak csökkentik a termelést, de növelik a vásárlásokat. A kereslet és a kínálat kiegyensúlyozásában az ár játssza a legfontosabb szerepet. Fajtái: piaci ár, egyensúlyi ár, rezervációs ár.",
+    example: "Ha egy kiló alma 500 forint, akkor az alma értéke pénzben kifejezve 500 forint.",
+    tip: "Három árfajtát sorolj fel: piaci ár, egyensúlyi ár, rezervációs ár. És mondd el az összehangoló szerepét.",
+    confuse: ["csereertek", "piaci-ar", "egyensulyi-ar"]
+  },
+  {
+    id: "piaci-ar",
+    m: "m2",
+    name: "Piaci ár",
+    short: "Az adott termék vagy szolgáltatás piacán a kereslet és a kínálat egymásra hatása következtében kialakult ár, amelyen a vevő megvásárolja, az eladó pedig eladja a terméket.",
+    long: "A piaci ár az, ami ténylegesen megvalósul. Nem feltétlenül egyezik meg az egyensúlyi árral: ha felette van, túlkínálat, ha alatta, túlkereslet alakul ki.",
+    example: "Egy boltban az alma ma 500 forint, mert ennyiért találkozik a vevői és az eladói szándék.",
+    tip: "Piaci ár = ami ténylegesen van. Egyensúlyi ár = ahol a keresett és a kínált mennyiség megegyezik.",
+    confuse: ["egyensulyi-ar", "ar", "rezervacios-ar"]
+  },
+  {
+    id: "egyensulyi-ar",
+    m: "m2",
+    name: "Egyensúlyi ár",
+    short: "A kínált és a keresett mennyiség egyezőségét biztosító ár. Piac-tisztító árnak is nevezik, mert e mellett az ár mellett az eladói és a vevői szándékok egyidejűleg teljesülnek.",
+    long: "Ezen az áron nincs sem hiány, sem felesleg. A piac magától efelé mozog: túlkínálatnál csökken, túlkeresletnél nő az ár.",
+    example: "Ha 500 forintos áron pontosan annyi almát akarnak venni, amennyit eladni, akkor 500 forint az egyensúlyi ár.",
+    tip: "Másik neve piac-tisztító ár, ezt a szinonimát kérdezni szokták.",
+    confuse: ["piaci-ar", "piaci-egyensuly", "ar"]
+  },
+  {
+    id: "rezervacios-ar",
+    m: "m2",
+    name: "Rezervációs ár",
+    short: "Fogyasztói rezervációs ár: az a legmagasabb ár, amelyen a fogyasztó még hajlandó megvásárolni egy termék adott mennyiségét. Termelői rezervációs ár: az a legalacsonyabb ár, amin a termelő még hajlandó értékesíteni a termékét.",
+    long: "A két rezervációs ár közötti sáv az a tartomány, amelyen belül az üzlet létrejöhet. A tényleges piaci ár és a rezervációs árak különbsége adja a fogyasztói és a termelői többletet.",
+    example: "Legfeljebb 700 forintot adnál egy kiló almáért, a termelő legalább 300 forintért adja. Az üzlet 300 és 700 között köthető meg.",
+    tip: "Fogyasztónál maximum, termelőnél minimum. Ezt a kettőt könnyű felcserélni, érdemes külön rögzíteni.",
+    confuse: ["fogyasztoi-tobblet", "termeloi-tobblet", "piaci-ar"]
+  },
+  {
+    id: "piaci-egyensuly",
+    m: "m2",
+    name: "Piaci egyensúly",
+    short: "Az összes különböző vásárló és eladó közötti egyensúly: azon az áron alakul ki, amelynél megegyezik a keresett mennyiség a kínált mennyiséggel.",
+    long: "Ezt az árat piactisztító árnak is nevezik, utalva arra, hogy ennél az árnál minden vevő megvette a keresett mennyiséget, az eladók pedig eladták az eladásra szánt termékeiket. Az üzlet létrejött, a vevők és az eladók is elérték a céljaikat, minden résztvevő elégedett.",
+    example: "A Marshall kereszten az a pont, ahol a keresleti és a kínálati görbe metszi egymást.",
+    tip: "Egyensúlyi ár = maga az ár. Piaci egyensúly = az állapot, ami ezen az áron kialakul.",
+    confuse: ["egyensulyi-ar", "marshall-kereszt", "piaci-mechanizmus"]
+  },
+  {
+    id: "piaci-mechanizmus",
+    m: "m2",
+    name: "Piaci mechanizmus",
+    short: "Az ár, a kereslet és a kínálat kölcsönhatása, amely az egyensúlyi helyzet felé mozgatja a piacot.",
+    long: "Adam Smith ezt az automatizmust nevezte láthatatlan kéznek. Senki nem irányítja felülről, mégis koordinál.",
+    example: "Ha túl sok az eladatlan alma, az eladók csökkentik az árat, erre nő a kereslet, és a piac visszatalál az egyensúlyhoz.",
+    tip: "Három eleme: ár, kereslet, kínálat. És a kapcsolódó név: Adam Smith, láthatatlan kéz.",
+    confuse: ["lathatatlan-kez", "piaci-egyensuly", "gazdasagi-rendszerek"]
+  },
+  {
+    id: "lathatatlan-kez",
+    m: "m2",
+    name: "Láthatatlan kéz",
+    short: "Annak a nem látható összehangolási folyamatnak a jellemzésére szolgáló kifejezés, amely a kompetitív piacgazdaságban az egyének gazdasági törekvéseinek az egységesítését biztosítja.",
+    long: "A kifejezést először Adam Smith használta. Szerinte azt az egyént, aki az önérdekét követve csak nyereséget akar elérni, ez a láthatatlan kéz olyan cél felé vezeti, ami nem is szerepel a szándékai között, azaz a társadalmi (közös) érdek megvalósulása felé.",
+    example: "A pék nem jóindulatból süt kenyeret, hanem a saját hasznáért, mégis jóllakottá teszi a környéket.",
+    tip: "A névhez kötődő kérdés szinte biztos: Adam Smith. És a lényeg: az önérdek a közös érdeket szolgálja, szándékolatlanul.",
+    confuse: ["piaci-mechanizmus"]
+  },
+  {
+    id: "marshall-kereszt",
+    m: "m2",
+    name: "Marshall kereszt",
+    short: "A keresleti és a kínálati görbe közös koordináta-rendszerben történő ábrázolása.",
+    long: "Az ábra alkalmas az egyensúly és az egyensúlytalanság modellszerű bemutatására, valamint az ármechanizmus érzékeltetésére. A két görbe metszéspontja az egyensúlyi pont.",
+    example: "Lefelé lejtő keresleti görbe és felfelé emelkedő kínálati görbe egy ábrán, a metszéspont az egyensúlyi ár és mennyiség.",
+    tip: "Névhez kötődő fogalom: Alfred Marshall. A kereszt onnan jön, hogy a két görbe metszi egymást.",
+    confuse: ["piaci-egyensuly", "keresleti-fuggveny", "kinalati-fuggveny"]
+  },
+  {
+    id: "kereslet",
+    m: "m2",
+    name: "Kereslet",
+    short: "A vevő vásárlási szándéka az áru különböző árai mellett.",
+    long: "A kereslet nem egyetlen szám, hanem egy egész ár-mennyiség sorozat, tehát maga a függvény. Ezért nem azonos a keresett mennyiséggel.",
+    example: "A kereslet az a teljes lista, hogy 300 forintnál 10 kiló almát, 500 forintnál 6 kilót, 700 forintnál 3 kilót vennél.",
+    tip: "Kereslet = szándék az összes ár mellett. Keresett mennyiség = egyetlen konkrét árhoz tartozó darabszám.",
+    confuse: ["keresett-mennyiseg", "keresleti-fuggveny", "piaci-kereslet"]
+  },
+  {
+    id: "keresett-mennyiseg",
+    m: "m2",
+    name: "Keresett mennyiség",
+    short: "A javaknak és szolgáltatásoknak az a mennyisége, amelyet a vásárlók adott ár mellett képesek és hajlandók megvásárolni.",
+    long: "Két feltétel kell egyszerre: képesség (fizetőképesség) és hajlandóság (szándék). Ha bármelyik hiányzik, nincs keresett mennyiség.",
+    example: "500 forintos áron 6 kiló almát vennél meg. Ez a keresett mennyiség ezen az áron.",
+    tip: "A két szó, ami nem maradhat ki: képesek és hajlandók. Plusz hogy adott ár mellett.",
+    confuse: ["kereslet", "kinalt-mennyiseg"]
+  },
+  {
+    id: "keresleti-fuggveny",
+    m: "m2",
+    name: "Keresleti függvény (keresleti görbe)",
+    short: "Függvényszerű kapcsolat az ár (független változó) és az általa meghatározott keresett mennyiség (függő változó) között. Általános képlete: D = f(P).",
+    long: "Másik megfogalmazásban: egyéb tényezők változatlansága mellett egy termék piaci ára és keresett mennyisége között határozott összefüggés érvényesül. A jelölésben D = Demand (kereslet), P = ár, f a függvénykapcsolat jele.",
+    example: "D = 20 - 2P, azaz minden 1 forintos áremelkedés 2 egységgel csökkenti a keresett mennyiséget.",
+    tip: "Képlet: D = f(P). Az ár a független változó. Az inverz változatban cserélődik a két tengelyváltozó.",
+    confuse: ["inverz-keresleti-fuggveny", "kinalati-fuggveny", "kereslet"]
+  },
+  {
+    id: "inverz-keresleti-fuggveny",
+    m: "m2",
+    name: "Inverz keresleti függvény",
+    short: "A keresleti függvény P-re (árra) történő átrendezése, a tengelyváltozók felcserélése. Általános alakja: P = f(D).",
+    long: "Ugyanazt a kapcsolatot írja le, csak fordított nézőpontból: nem az árból következtetünk a mennyiségre, hanem a mennyiségből arra, hogy mekkora árat hajlandók fizetni.",
+    example: "Ha D = 20 - 2P, akkor az inverz alak P = 10 - 0,5D.",
+    tip: "Normál: D = f(P). Inverz: P = f(D). Az inverznél az ár van egyedül a bal oldalon.",
+    confuse: ["keresleti-fuggveny"]
+  },
+  {
+    id: "csokkeno-kereslet-torvenye",
+    m: "m2",
+    name: "Csökkenő kereslet törvénye",
+    short: "Az az általános szabály, hogy ha egy termék ára emelkedik, más tényezők változatlansága mellett a fogyasztók kevesebbet vásárolnak belőle, ha viszont az ár csökken, a keresett mennyiség megnő. Ezért a keresleti görbék általában negatív meredekségűek.",
+    long: "Az ár és a keresett mennyiség tehát ellentétes irányban mozog. A ceteris paribus feltétel itt kötelező elem.",
+    example: "Ha a kávé ára megduplázódik, a legtöbben kevesebb kávét vesznek.",
+    tip: "A következtetést is mondd el: ezért negatív meredekségű a keresleti görbe.",
+    confuse: ["keresleti-fuggveny", "ceteris-paribus"]
+  },
+  {
+    id: "piaci-kereslet",
+    m: "m2",
+    name: "Piaci kereslet",
+    short: "Egy adott termék iránti összesített kereslet, az egyéni keresletek horizontális összessége.",
+    long: "Horizontális összegzés azt jelenti, hogy adott áron összeadjuk az egyes fogyasztók keresett mennyiségeit, tehát a mennyiségeket adjuk össze, nem az árakat.",
+    example: "Ha 500 forintos áron te 6 kilót, a szomszéd 4 kilót venne, akkor ezen az áron a piaci kereslet 10 kiló.",
+    tip: "A kulcsszó a horizontális: a mennyiségeket adjuk össze adott ár mellett.",
+    confuse: ["kereslet", "keresett-mennyiseg"]
+  },
+  {
+    id: "kinalat",
+    m: "m2",
+    name: "Kínálat",
+    short: "Az eladó eladási szándéka az áru különböző árai mellett.",
+    long: "A kereslet tükörképe az eladói oldalon. Szintén egy teljes ár-mennyiség sorozat, nem egyetlen szám.",
+    example: "A kínálat az a lista, hogy 300 forintnál 2 kiló almát, 500 forintnál 6 kilót, 700 forintnál 10 kilót adnál el.",
+    tip: "Kínálat = szándék minden ár mellett. Kínált mennyiség = egy konkrét árhoz tartozó darabszám.",
+    confuse: ["kinalt-mennyiseg", "kinalati-fuggveny", "kereslet"]
+  },
+  {
+    id: "kinalt-mennyiseg",
+    m: "m2",
+    name: "Kínált mennyiség",
+    short: "Az a mennyiség, amelyet a termelő az adott piaci ár mellett képes és hajlandó piacra vinni.",
+    long: "Ugyanaz a kettős feltétel, mint a keresett mennyiségnél: képesség és hajlandóság, egy adott ár mellett.",
+    example: "500 forintos áron a termelő 6 kiló almát visz piacra.",
+    tip: "Képes és hajlandó, adott ár mellett, piacra vinni. Ez a három elem.",
+    confuse: ["kinalat", "keresett-mennyiseg"]
+  },
+  {
+    id: "kinalati-fuggveny",
+    m: "m2",
+    name: "Kínálati függvény (kínálati görbe)",
+    short: "Függvényszerű kapcsolat a termelők által eladni kívánt jószágmennyiség és a piaci ár között. Általános képlete: S = f(P).",
+    long: "Másik megfogalmazásban: egy termék piaci ára és a termelők által értékesítésre előállított mennyiség közötti kapcsolat, minden egyéb tényező változatlansága mellett. A kínálati görbe jellemzően pozitív meredekségű, mert magasabb ár mellett többet éri meg termelni.",
+    example: "S = 2P - 4, azaz minden 1 forintos áremelkedés 2 egységgel növeli a kínált mennyiséget.",
+    tip: "Képlet: S = f(P). A tananyagban az S jelölés feloldása Saving, de a tartalma a kínálat, erre figyelj a vizsgán.",
+    confuse: ["keresleti-fuggveny", "kinalat"]
+  },
+  {
+    id: "vevo",
+    m: "m2",
+    name: "Vevő",
+    short: "Az a fizetőképes egyén, aki az adott piacon árut szándékozik vásárolni.",
+    long: "Két együttes feltétel: fizetőképesség és vásárlási szándék. Aki szeretne, de nem tud fizetni, nem vevő.",
+    example: "Aki pénzzel a zsebében bemegy a boltba azzal a szándékkal, hogy vásárol.",
+    tip: "A fizetőképes szó nem díszítés, ez a definíció lényegi eleme.",
+    confuse: ["elado", "keresett-mennyiseg"]
+  },
+  {
+    id: "elado",
+    m: "m2",
+    name: "Eladó",
+    short: "Az az árutulajdonos, aki az adott piacon eladni szándékozik az áruját.",
+    long: "Az eladó a kínálati oldal szereplője. Alapfeltétel, hogy tulajdonosa legyen az árunak.",
+    example: "A piaci standnál álló termelő, aki a saját almáját kínálja eladásra.",
+    tip: "Két elem: árutulajdonos, plusz eladási szándék.",
+    confuse: ["vevo", "kinalt-mennyiseg"]
+  },
+  {
+    id: "fogyasztoi-tobblet",
+    m: "m2",
+    name: "Fogyasztói többlet",
+    short: "A fogyasztói rezervációs ár és a tényleges piaci ár különbsége.",
+    long: "Bővebben: egy jószág teljes hasznossága és teljes piaci értéke közötti különbség. A fogalom azon a feltételezésen alapul, hogy vevőként többet kapunk, mint amennyit megfizetünk, hiszen fogyasztóként az utolsó egység árát fizetjük a termékért, viszont minden elfogyasztott egységével nagyobb haszonra teszünk szert (bár csökkenő mértékben), mint az utolsó elfogyasztásával.",
+    example: "Legfeljebb 700 forintot adtál volna egy kiló almáért, de 500-ért megkaptad. A fogyasztói többleted 200 forint.",
+    tip: "Fogyasztói: rezervációs ár mínusz piaci ár. Termelői: piaci ár mínusz rezervációs ár. A kivonás iránya a különbség.",
+    confuse: ["termeloi-tobblet", "rezervacios-ar"]
+  },
+  {
+    id: "termeloi-tobblet",
+    m: "m2",
+    name: "Termelői többlet",
+    short: "A tényleges piaci ár és a termelői rezervációs ár különbsége.",
+    long: "Azt mutatja, mennyivel kapott többet a termelő annál, mint amennyiért még éppen hajlandó lett volna eladni.",
+    example: "A termelő 300 forintért is odaadta volna, de 500-ért kelt el. A termelői többlete 200 forint.",
+    tip: "Itt a piaci ár van elöl a kivonásban, mert a termelő a minimumánál kap többet.",
+    confuse: ["fogyasztoi-tobblet", "rezervacios-ar"]
+  }
+]);
+
+// 3. modul: Rugalmasság (14 fogalom)
+window.CONCEPTS = (window.CONCEPTS || []).concat([
+  {
+    id: "rugalmassag",
+    m: "m3",
+    name: "Rugalmasság",
+    short: "Azt fejezi ki, hogy ha egy befolyásoló tényező 1 százalékkal megváltozik, akkor ennek hatására hány százalékkal változik meg a vizsgált (befolyásolt) tényező. Egy hányados, amit úgy kapunk, hogy a függő változó százalékos változását elosztjuk a független változó százalékos változásával.",
+    long: "A rugalmasság mindig százalékos változások hányadosa, ezért mértékegység nélküli szám. Emiatt lehet vele összehasonlítani olyan dolgokat is, amelyeket egyébként más egységben mérünk.",
+    example: "Ha az ár 10 százalékkal nő és a keresett mennyiség 20 százalékkal csökken, a rugalmasság abszolút értéke 2.",
+    tip: "A képlet szerkezete: függő változó százalékos változása osztva a független változó százalékos változásával. Mindig százalék per százalék.",
+    confuse: ["kereslet-arrugalmassaga", "jovedelemrugalmassag"]
+  },
+  {
+    id: "kereslet-arrugalmassaga",
+    m: "m3",
+    name: "Kereslet árrugalmassága",
+    short: "Azt fejezi ki, hogy hány százalékkal változik meg a keresett mennyiség egy százalékos árváltozás hatására.",
+    long: "Három fajtája van: rugalmas, rugalmatlan és egységnyi rugalmas keresletű jószág. Mivel az ár és a keresett mennyiség ellentétes irányban mozog, a mutató előjele jellemzően negatív, ezért abszolút értékben szoktuk vizsgálni.",
+    example: "Ha az ár 10 százalékkal nő és a keresett mennyiség 5 százalékkal csökken, a mutató abszolút értéke 0,5, tehát rugalmatlan a kereslet.",
+    tip: "A három fajtát mindig sorold fel: rugalmas, rugalmatlan, egységnyi rugalmas.",
+    confuse: ["rugalmassag", "kinalat-arrugalmassaga", "kereszt-arrugalmassag"]
+  },
+  {
+    id: "arrugalmas-kereslet",
+    m: "m3",
+    name: "Árrugalmas kereslet",
+    short: "A keresett mennyiség százalékos változása meghaladja az ár százalékos változását. Az árrugalmassági mutató abszolút értéke nagyobb, mint egy.",
+    long: "A vevők erősen reagálnak az árra. Jellemzően ilyenek a nem létszükségleti cikkek és azok a termékek, amelyeknek sok helyettesítője van.",
+    example: "Az ár 10 százalékos emelkedésére a keresett mennyiség 25 százalékkal esik vissza, a mutató abszolút értéke 2,5.",
+    tip: "Rugalmas = nagyobb mint 1. A mennyiség reagál jobban, mint az ár.",
+    confuse: ["arrugalmatlan-kereslet", "egysegnyi-arrugalmassagu-kereslet"]
+  },
+  {
+    id: "arrugalmatlan-kereslet",
+    m: "m3",
+    name: "Árrugalmatlan kereslet",
+    short: "A keresett mennyiség százalékos változása kisebb az ár százalékos változásánál. Az árrugalmassági mutató abszolút értéke kisebb, mint egy.",
+    long: "A vevők alig reagálnak az árváltozásra. Jellemzően a létszükségleti cikkeknél és a nehezen helyettesíthető termékeknél fordul elő.",
+    example: "Az ár 10 százalékos emelkedésére a keresett mennyiség csak 3 százalékkal csökken, a mutató abszolút értéke 0,3.",
+    tip: "Rugalmatlan = kisebb mint 1. Az ár változik jobban, mint a mennyiség.",
+    confuse: ["arrugalmas-kereslet", "egysegnyi-arrugalmassagu-kereslet"]
+  },
+  {
+    id: "egysegnyi-arrugalmassagu-kereslet",
+    m: "m3",
+    name: "Egységnyi árrugalmasságú kereslet",
+    short: "A keresett mennyiség százalékos változása megegyezik az ár százalékos változásával. Az árrugalmassági mutató abszolút értéke egyenlő eggyel.",
+    long: "Ez a határeset a rugalmas és a rugalmatlan kereslet között.",
+    example: "Az ár 10 százalékkal nő, a keresett mennyiség pontosan 10 százalékkal csökken, a mutató abszolút értéke 1.",
+    tip: "Pontosan egy. Ez a választóvonal a másik két eset között.",
+    confuse: ["arrugalmas-kereslet", "arrugalmatlan-kereslet"]
+  },
+  {
+    id: "kinalat-arrugalmassaga",
+    m: "m3",
+    name: "Kínálat árrugalmassága",
+    short: "A termelők által kínált termékmennyiség százalékos változása a piaci ár egy százalékos változásának következtében.",
+    long: "Az eladói oldal reakciója az árra. Mivel az ár és a kínált mennyiség azonos irányban mozog, ez a mutató jellemzően pozitív.",
+    example: "Ha az ár 10 százalékkal nő és a kínált mennyiség 15 százalékkal, a mutató értéke 1,5.",
+    tip: "Ugyanaz a logika, mint a kereslet árrugalmasságánál, csak a termelői oldalon és pozitív előjellel.",
+    confuse: ["kereslet-arrugalmassaga"]
+  },
+  {
+    id: "kereszt-arrugalmassag",
+    m: "m3",
+    name: "Kereszt árrugalmasság",
+    short: "Azt mutatja meg, hogy az egyik termék árának egy százalékos megváltozása hány százalékkal változtatja meg a másik termék iránti keresletet.",
+    long: "Két termék kapcsolatát méri. Az előjele árulja el a viszonyt: pozitív esetén helyettesítő, negatív esetén kiegészítő, nulla esetén független termékekről van szó.",
+    example: "Ha a vaj ára nő és emiatt több margarint vesznek, akkor a kereszt árrugalmasság pozitív.",
+    tip: "Két termék, két különböző mutató (az egyik ára, a másik kereslete). Az előjel dönti el a kapcsolat típusát.",
+    confuse: ["helyettesito-termekek", "kiegeszito-termekek", "kereslet-arrugalmassaga"]
+  },
+  {
+    id: "helyettesito-termekek",
+    m: "m3",
+    name: "Helyettesítő termékek",
+    short: "A vizsgált termék árának növekedése a másik termék keresletében növekedést idézett elő. Ilyenkor az árrugalmassági együttható pozitív.",
+    long: "A két termék ugyanazt a szükségletet elégíti ki, ezért a fogyasztó átvált az olcsóbbra.",
+    example: "Vaj és margarin, Pepsi és Coca-Cola, vonat és távolsági busz.",
+    tip: "Helyettesítő = pozitív együttható. Azonos irányba mozog az egyik ára és a másik kereslete.",
+    confuse: ["kiegeszito-termekek", "fuggetlen-termekek", "kereszt-arrugalmassag"]
+  },
+  {
+    id: "kiegeszito-termekek",
+    m: "m3",
+    name: "Kiegészítő termékek",
+    short: "A vizsgált termék árának változása ellentétes irányba mozdítja a másik termék keresletét. Ilyenkor a kereszt árrugalmassági együttható negatív előjelű.",
+    long: "A két terméket együtt használják, ezért ha az egyik drágul, a másikból is kevesebb fogy.",
+    example: "Autó és benzin, nyomtató és patron, kávéfőző és kávékapszula.",
+    tip: "Kiegészítő = negatív együttható. Együtt fogyasztjuk őket, ezért ellentétes irányba mozdulnak.",
+    confuse: ["helyettesito-termekek", "fuggetlen-termekek"]
+  },
+  {
+    id: "fuggetlen-termekek",
+    m: "m3",
+    name: "Független termékek",
+    short: "A vizsgált termék árának változása nem hatott a másik termék keresletének változására. A kereszt árrugalmassági együttható értéke ilyenkor nulla.",
+    long: "A két termék semmilyen fogyasztási kapcsolatban nem áll egymással.",
+    example: "A cement ára és a fogkrém kereslete.",
+    tip: "Független = nulla. Három eset, három előjel: pozitív, negatív, nulla.",
+    confuse: ["helyettesito-termekek", "kiegeszito-termekek"]
+  },
+  {
+    id: "jovedelemrugalmassag",
+    m: "m3",
+    name: "Jövedelemrugalmasság",
+    short: "Egy termék keresett mennyiségének százalékos változása a jövedelem egy százalékos változásának hatására.",
+    long: "A jövedelem megnövekedésének hatására a fogyasztók különböző módon változtatják meg az egyes jószágok iránti keresletüket, így megkülönböztetünk normál, inferior és luxus javakat.",
+    example: "Ha a jövedelem 10 százalékkal nő és emiatt 5 százalékkal több ruhát vesznek, a mutató 0,5.",
+    tip: "A három jószágtípust mindig sorold fel mellé: normál, inferior, luxus.",
+    confuse: ["rugalmassag", "normal-joszag", "luxus-joszag"]
+  },
+  {
+    id: "normal-joszag",
+    m: "m3",
+    name: "Normál jószág",
+    short: "Olyan javak, amelyekből a fogyasztó többet vásárol, ha növekszik a jövedelme, illetve kevesebbet, ha csökken. Az ilyen jószágok kereslete a jövedelemváltozással megegyező irányban változik, így a jövedelemrugalmasság pozitív lesz.",
+    long: "A jövedelemrugalmasság tehát pozitív. A luxus jószág ennek egy szűkebb esete, ahol a mutató nemcsak pozitív, hanem egynél is nagyobb.",
+    example: "Ha többet keresel, több ruhát és jobb élelmiszert veszel.",
+    tip: "Normál = pozitív. Luxus = pozitív és egynél nagyobb. Inferior = negatív.",
+    confuse: ["luxus-joszag", "inferior-joszag", "jovedelemrugalmassag"]
+  },
+  {
+    id: "inferior-joszag",
+    m: "m3",
+    name: "Inferior jószág",
+    short: "Olyan javak, amelyekből a fogyasztó kevesebbet vásárol, ha növekszik a jövedelme, illetve többet, ha csökken. Ezeknek a jószágoknak a kereslete a jövedelem változásával ellentétes irányban mozdul el, így a jövedelemrugalmasság negatív.",
+    long: "Jellemzően olcsóbb, gyengébb minőségű helyettesítők, amelyekről a fogyasztó lemond, amint megteheti.",
+    example: "Olcsó konzervhús, zsíros kenyér, legolcsóbb kategóriás termékek.",
+    tip: "Inferior = negatív jövedelemrugalmasság. Ez az egyetlen a három közül, ahol negatív előjel szerepel.",
+    confuse: ["normal-joszag", "luxus-joszag"]
+  },
+  {
+    id: "luxus-joszag",
+    m: "m3",
+    name: "Luxus jószág",
+    short: "Olyan javak, amelyeknél 1 százalékos jövedelemnövekedés esetén a keresett mennyiség növekedése 1 százaléknál nagyobb mértékű. A jövedelemrugalmasság pozitív, és egynél nagyobb lesz.",
+    long: "A luxus jószág a normál jószág egy speciális esete: a jövedelem emelkedésére a kereslet aránytalanul erősen reagál.",
+    example: "Nyaralás, prémium autó, drága étterem.",
+    tip: "Luxus = pozitív és nagyobb mint 1. Vigyázz, ne keverd az árrugalmassággal: itt a jövedelem a független változó.",
+    confuse: ["normal-joszag", "arrugalmas-kereslet", "jovedelemrugalmassag"]
+  }
+]);
+
+/* =========================================================
+   Közgazdaságtan Fogalomtanuló
+   Teljes tanulómotor: Leitner ismétlés + napi terv + kvíz
+   ========================================================= */
+
+const STORE = 'kozgaz_app_v1';
+const CONCEPTS = window.CONCEPTS || [];
+const MODULES = window.MODULES || [];
+const BOX_DAYS = [0, 1, 2, 4, 8, 16];   // 1..5 doboz -> hány nap múlva jön vissza
+const LEVEL_XP = 120;                    // ennyi XP egy szint
+
+/* ---------- segédfüggvények ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const todayStr = () => new Date().toISOString().slice(0, 10);
+const addDays = (d, n) => { const x = new Date(d + 'T00:00:00'); x.setDate(x.getDate() + n); return x.toISOString().slice(0,10); };
+const dayDiff = (a, b) => Math.round((new Date(b+'T00:00:00') - new Date(a+'T00:00:00')) / 86400000);
+const shuffle = a => { const r = a.slice(); for (let i = r.length-1; i > 0; i--) { const j = Math.floor(Math.random()*(i+1)); [r[i],r[j]] = [r[j],r[i]]; } return r; };
+const byId = id => CONCEPTS.find(c => c.id === id);
+const modOf = id => MODULES.find(m => m.id === id);
+
+/* ---------- állapot ---------- */
+let S = null;
+
+function defaultState() {
+  const t = todayStr();
+  return {
+    xp: 0, streak: 0, lastActive: t, startDate: t,
+    examDate: addDays(t, 13),
+    cards: {}, badges: [], dayLog: {},
+    stats: { qTotal: 0, qOk: 0, examBest: 0, examRuns: 0 }
+  };
+}
+function load() {
+  try { S = JSON.parse(localStorage.getItem(STORE)) || defaultState(); }
+  catch (e) { S = defaultState(); }
+  const d = defaultState();
+  for (const k in d) if (S[k] === undefined) S[k] = d[k];
+  CONCEPTS.forEach(c => {
+    if (!S.cards[c.id]) S.cards[c.id] = { box: 0, due: null, seen: 0, ok: 0, bad: 0 };
+  });
+  checkStreak();
+  save();
+}
+function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch (e) {} }
+
+function checkStreak() {
+  const t = todayStr();
+  if (S.lastActive === t) return;
+  const diff = dayDiff(S.lastActive, t);
+  if (diff === 1) S.streak += 1;
+  else if (diff > 1) S.streak = 0;
+  S.lastActive = t;
+}
+function logDay(key, n) {
+  const t = todayStr();
+  S.dayLog[t] = S.dayLog[t] || { nw: 0, rev: 0, xp: 0, q: 0 };
+  S.dayLog[t][key] = (S.dayLog[t][key] || 0) + n;
+}
+function addXP(n) {
+  const before = level();
+  S.xp += n; logDay('xp', n);
+  if (level() > before) toast('🎉 Új szint: ' + level() + '!');
+  save(); renderTop();
+}
+const level = () => Math.floor(S.xp / LEVEL_XP) + 1;
+const levelPct = () => Math.round((S.xp % LEVEL_XP) / LEVEL_XP * 100);
+
+/* ---------- Leitner ismétlés ---------- */
+function grade(id, correct) {
+  const c = S.cards[id];
+  c.seen++;
+  if (correct) {
+    c.ok++;
+    c.box = Math.min(5, (c.box || 0) + 1);
+    addXP(c.box >= 4 ? 4 : 6);
+  } else {
+    c.bad++;
+    c.box = 1;
+    addXP(1);
+  }
+  c.due = addDays(todayStr(), BOX_DAYS[c.box]);
+  if (c.box === 1 && !correct) c.due = todayStr();
+  save(); checkBadges();
+}
+const isLearned = id => (S.cards[id].box || 0) >= 1;
+const isMastered = id => (S.cards[id].box || 0) >= 4;
+const dueCards = () => CONCEPTS.filter(c => { const k = S.cards[c.id]; return k.box > 0 && k.due && k.due <= todayStr(); });
+const newCards = () => CONCEPTS.filter(c => (S.cards[c.id].box || 0) === 0);
+const learnedCount = () => CONCEPTS.filter(c => isLearned(c.id)).length;
+const masteredCount = () => CONCEPTS.filter(c => isMastered(c.id)).length;
+
+function modStats(mid) {
+  const list = CONCEPTS.filter(c => c.m === mid);
+  const lrn = list.filter(c => isLearned(c.id)).length;
+  const mst = list.filter(c => isMastered(c.id)).length;
+  return { total: list.length, lrn, mst, pct: Math.round(mst / list.length * 100) };
+}
+
+/* ---------- tanulási terv ---------- */
+function planDays() {
+  const start = S.startDate, exam = S.examDate;
+  let n = Math.max(3, Math.min(40, dayDiff(start, exam) + 1));
+  const learnDays = Math.max(1, n - 2);           // utolsó 2 nap: ismétlés + próbavizsga
+  const per = Math.ceil(CONCEPTS.length / learnDays);
+  const order = CONCEPTS.slice();                 // modul sorrendben
+  const days = [];
+  let i = 0;
+  for (let d = 0; d < n; d++) {
+    const date = addDays(start, d);
+    const chunk = d < learnDays ? order.slice(i, i + per) : [];
+    i += chunk.length;
+    days.push({
+      n: d + 1,
+      date,
+      newIds: chunk,
+      kind: d < learnDays ? 'tanulás' : (d === n - 2 ? 'teljes ismétlés' : 'próbavizsga')
+    });
+  }
+  return days;
+}
+function todayPlan() {
+  const days = planDays(), t = todayStr();
+  return days.find(d => d.date === t) || days.find(d => d.date > t) || days[days.length - 1];
+}
+
+/* ---------- kitűzők ---------- */
+const BADGES = [
+  { id: 'start',   emoji: '🚀', name: 'Első lépés',    test: () => learnedCount() >= 1 },
+  { id: 'ten',     emoji: '🔟', name: '10 fogalom',    test: () => learnedCount() >= 10 },
+  { id: 'm1',      emoji: '📘', name: '1. modul kész', test: () => modStats('m1').mst === modStats('m1').total },
+  { id: 'm2',      emoji: '⚖️', name: '2. modul kész', test: () => modStats('m2').mst === modStats('m2').total },
+  { id: 'm3',      emoji: '📈', name: '3. modul kész', test: () => modStats('m3').mst === modStats('m3').total },
+  { id: 'half',    emoji: '🏅', name: 'Félút (36)',    test: () => masteredCount() >= 36 },
+  { id: 'all',     emoji: '👑', name: 'Mind a 72',     test: () => masteredCount() === CONCEPTS.length },
+  { id: 'streak3', emoji: '🔥', name: '3 napos sorozat', test: () => S.streak >= 3 },
+  { id: 'streak7', emoji: '💎', name: '7 napos sorozat', test: () => S.streak >= 7 },
+  { id: 'exam80',  emoji: '🎓', name: 'Vizsga 80%+',   test: () => S.stats.examBest >= 80 }
+];
+function checkBadges() {
+  BADGES.forEach(b => {
+    if (!S.badges.includes(b.id) && b.test()) { S.badges.push(b.id); toast(b.emoji + ' Kitűző: ' + b.name); }
+  });
+  save();
+}
+
+/* ---------- kérdésgenerátor ---------- */
+function distractors(c, n) {
+  let pool = (c.confuse || []).map(byId).filter(Boolean);
+  pool = pool.concat(shuffle(CONCEPTS.filter(x => x.m === c.m && x.id !== c.id && !pool.includes(x))));
+  pool = pool.concat(shuffle(CONCEPTS.filter(x => x.id !== c.id)));
+  const out = [];
+  for (const p of pool) { if (p.id !== c.id && !out.find(o => o.id === p.id)) out.push(p); if (out.length === n) break; }
+  return out;
+}
+function trim(t, n) { return t.length > n ? t.slice(0, n).replace(/[\s,.;:]+\S*$/, '') + '…' : t; }
+
+function makeQuestion(c) {
+  const type = ['def', 'name', 'ex'][Math.floor(Math.random() * 3)];
+  const d = distractors(c, 3);
+  let prompt, optText;
+  if (type === 'def') {
+    prompt = 'Melyik fogalom meghatározása ez?<br><span class="muted">„' + esc(trim(c.short, 230)) + '”</span>';
+    optText = x => x.name;
+  } else if (type === 'ex') {
+    prompt = 'Melyik fogalomra illik ez a példa?<br><span class="muted">„' + esc(c.example) + '”</span>';
+    optText = x => x.name;
+  } else {
+    prompt = 'Mit jelent: <b>' + esc(c.name) + '</b>?';
+    optText = x => trim(x.short, 115);
+  }
+  const opts = shuffle([c, ...d]).map(x => ({ id: x.id, text: optText(x) }));
+  return { cid: c.id, prompt, opts, type };
+}
+function buildQuiz(list, count) {
+  const pick = shuffle(list).slice(0, count);
+  return pick.map(makeQuestion);
+}
+
+/* ---------- toast ---------- */
+let tTimer;
+function toast(msg) {
+  let el = $('#toast');
+  if (!el) { el = document.createElement('div'); el.id = 'toast'; el.className = 'toast'; document.body.appendChild(el); }
+  el.textContent = msg; el.style.display = 'block';
+  clearTimeout(tTimer); tTimer = setTimeout(() => el.style.display = 'none', 2200);
+}
+
+/* =========================================================
+   NÉZETEK
+   ========================================================= */
+let view = 'home', ctx = {};
+
+function renderTop() {
+  $('#lvl').textContent = 'Szint ' + level();
+  $('#streak').textContent = '🔥 ' + S.streak;
+  $('#xpfill').style.width = levelPct() + '%';
+  $('#xpnow').textContent = S.xp + ' XP';
+  $('#xpnext').textContent = (LEVEL_XP - (S.xp % LEVEL_XP)) + ' XP a ' + (level() + 1) + '. szintig';
+}
+function nav(v, c = {}) {
+  view = v; ctx = c; window.scrollTo(0, 0);
+  document.querySelectorAll('.nav button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  render();
+}
+function render() {
+  renderTop();
+  const r = { home: vHome, learn: vLearnList, learning: vLearn, flash: vFlash, quiz: vQuizStart,
+              quizrun: vQuizRun, exam: vExam, examrun: vExamRun, plan: vPlan, prog: vProg }[view] || vHome;
+  $('#app').innerHTML = r();
+  if (view === 'quizrun' || view === 'examrun') bindQuiz();
+}
+
+/* ---------- FŐOLDAL ---------- */
+function vHome() {
+  const p = todayPlan();
+  const due = dueCards().length, nw = newCards().length;
+  const todo = p.newIds.filter(c => !isLearned(c.id)).length;
+  const pct = Math.round(masteredCount() / CONCEPTS.length * 100);
+  const daysLeft = dayDiff(todayStr(), S.examDate);
+
+  return `
+  <div class="card">
+    <div class="sb"><h1>Szia! 👋</h1>
+      <span class="tiny">${daysLeft >= 0 ? daysLeft + ' nap a vizsgáig' : 'vizsga elmúlt'}</span></div>
+    <p class="muted">Mai feladat a terv szerint: <b style="color:var(--txt)">${p.kind}</b></p>
+    <div class="grid3" style="margin:12px 0">
+      <div class="stat"><b>${todo}</b><span>új fogalom ma</span></div>
+      <div class="stat"><b>${due}</b><span>ismétlés esedékes</span></div>
+      <div class="stat"><b>${pct}%</b><span>bevésve</span></div>
+    </div>
+    ${todo > 0 ? `<button class="btn" onclick="startTodayNew()">📚 Mai új fogalmak (${todo})</button>` : ''}
+    ${due > 0 ? `<button class="btn ${todo>0?'sec':''}" style="margin-top:8px" onclick="startReview()">🔁 Ismétlés most (${due})</button>` : ''}
+    ${todo === 0 && due === 0 ? `<div class="fb good"><b>Mára kész vagy! ✅</b>Nincs esedékes ismétlés. Ha van kedved, gyakorolj egy kvízzel.</div>
+      <button class="btn sec" style="margin-top:8px" onclick="nav('quiz')">🎯 Extra kvíz</button>` : ''}
+  </div>
+
+  <h2 style="margin:18px 0 10px">Modulok</h2>
+  ${MODULES.map(m => { const st = modStats(m.id); return `
+    <div class="card mod" onclick="nav('learn',{m:'${m.id}'})">
+      <div class="em">${m.emoji}</div>
+      <div style="flex:1;min-width:0">
+        <div class="sb"><h3 style="margin:0">${m.num}. ${esc(m.title)}</h3><span class="tiny">${st.mst}/${st.total}</span></div>
+        <div class="muted" style="font-size:13px">${esc(m.desc)}</div>
+        <div class="bar"><i style="width:${st.pct}%"></i></div>
+      </div>
+    </div>`; }).join('')}
+
+  <div class="card">
+    <h3>Gyors indítás</h3>
+    <div class="grid2">
+      <button class="btn sec sm" style="width:100%" onclick="nav('flash',{ids:allIds()})">🃏 Villámkártyák</button>
+      <button class="btn sec sm" style="width:100%" onclick="nav('quiz')">🎯 Kvíz</button>
+      <button class="btn sec sm" style="width:100%" onclick="nav('exam')">🎓 Próbavizsga</button>
+      <button class="btn sec sm" style="width:100%" onclick="nav('plan')">🗓️ Tanulóterv</button>
+    </div>
+  </div>`;
+}
+const allIds = () => CONCEPTS.map(c => c.id);
+function startTodayNew() {
+  const p = todayPlan();
+  const ids = p.newIds.filter(c => !isLearned(c.id)).map(c => c.id);
+  nav('learning', { ids, i: 0, src: 'terv' });
+}
+function startReview() { nav('quizrun', { qs: buildQuiz(dueCards(), Math.min(15, dueCards().length)), i: 0, ok: 0, title: 'Ismétlés' }); }
+
+/* ---------- MODUL / FOGALOMLISTA ---------- */
+function vLearnList() {
+  const mid = ctx.m || 'm1';
+  const m = modOf(mid), list = CONCEPTS.filter(c => c.m === mid), st = modStats(mid);
+  return `
+  <div class="card">
+    <button class="btn ghost sm" onclick="nav('home')">← Vissza</button>
+    <h1 style="margin-top:12px">${m.emoji} ${m.num}. ${esc(m.title)}</h1>
+    <p class="muted">${esc(m.desc)}</p>
+    <div class="bar"><i style="width:${st.pct}%"></i></div>
+    <div class="tiny" style="margin-top:6px">${st.mst} bevésve / ${st.lrn} látott / ${st.total} fogalom</div>
+    <div class="grid2" style="margin-top:12px">
+      <button class="btn" onclick="nav('learning',{ids:modIds('${mid}'),i:0})">📚 Átvétel</button>
+      <button class="btn sec" onclick="nav('quizrun',{qs:buildQuiz(CONCEPTS.filter(c=>c.m==='${mid}'),10),i:0,ok:0,title:'${esc(m.title)} kvíz'})">🎯 Kvíz (10)</button>
+    </div>
+    <button class="btn sec" style="margin-top:8px" onclick="nav('flash',{ids:modIds('${mid}')})">🃏 Villámkártyák</button>
+  </div>
+  <div class="card">
+    <h3>Fogalmak (${list.length})</h3>
+    <div class="clist">
+      ${list.map(c => { const b = S.cards[c.id].box || 0; return `
+        <div class="citem" onclick="nav('learning',{ids:['${c.id}'],i:0})" style="cursor:pointer">
+          <div class="box b${b}">${b || '–'}</div><div style="flex:1">${esc(c.name)}</div>
+          <span class="tiny">›</span>
+        </div>`; }).join('')}
+    </div>
+    <p class="tiny" style="margin-top:10px">A szám a Leitner doboz: 1 = friss, 5 = tartósan bevésve. Minél magasabb, annál ritkábban kérdez rá az app.</p>
+  </div>`;
+}
+const modIds = m => CONCEPTS.filter(c => c.m === m).map(c => c.id);
+
+/* ---------- TANULÓKÁRTYA (magyarázat) ---------- */
+function vLearn() {
+  const { ids, i } = ctx;
+  if (!ids || !ids.length) return `<div class="card center"><h2>Nincs mit tanulni 🎉</h2>
+    <button class="btn" style="margin-top:10px" onclick="nav('home')">Vissza</button></div>`;
+  if (i >= ids.length) {
+    return `<div class="card center">
+      <h1>Kész a kör! ✅</h1>
+      <p class="muted">${ids.length} fogalmat vettél át. Most jöjjön az ellenőrzés.</p>
+      <button class="btn" onclick="nav('quizrun',{qs:buildQuiz(ctxIds(),Math.min(12,${ids.length})),i:0,ok:0,title:'Ellenőrzés'})">🎯 Kvíz a most tanultakból</button>
+      <button class="btn sec" style="margin-top:8px" onclick="nav('home')">Főoldal</button>
+    </div>`;
+  }
+  const c = byId(ids[i]), m = modOf(c.m);
+  return `
+  <div class="card">
+    <div class="sb"><button class="btn ghost sm" onclick="nav('home')">✕ Kilépés</button>
+      <span class="tiny">${i + 1} / ${ids.length}</span></div>
+    <div class="prog" style="margin-top:12px"><i style="width:${(i) / ids.length * 100}%"></i></div>
+    <span class="pill">${m.emoji} ${m.num}. modul</span>
+    <div class="concept-name">${esc(c.name)}</div>
+    <div class="def">${esc(c.short)}</div>
+    <div class="blk"><div class="lbl">Magyarázat</div><div>${esc(c.long)}</div></div>
+    <div class="blk ex"><div class="lbl">Példa</div><div>${esc(c.example)}</div></div>
+    <div class="blk tip"><div class="lbl">Vizsgatipp</div><div>${esc(c.tip)}</div></div>
+    ${(c.confuse || []).length ? `<div class="blk"><div class="lbl">Ne keverd össze</div>
+      <div>${c.confuse.map(x => byId(x)).filter(Boolean).map(x => `<span class="chip">${esc(x.name)}</span>`).join('')}</div></div>` : ''}
+  </div>
+  <div class="grid2">
+    <button class="btn sec" onclick="learnStep(-1)" ${i === 0 ? 'disabled' : ''}>← Előző</button>
+    <button class="btn" onclick="learnDone('${c.id}')">Megvan, tovább →</button>
+  </div>`;
+}
+const ctxIds = () => (ctx.ids || []).map(byId).filter(Boolean);
+function learnStep(d) { nav('learning', { ...ctx, i: Math.max(0, ctx.i + d) }); }
+function learnDone(id) {
+  if ((S.cards[id].box || 0) === 0) {
+    S.cards[id].box = 1; S.cards[id].due = addDays(todayStr(), 1);
+    addXP(5); logDay('nw', 1); checkBadges();
+  }
+  save(); nav('learning', { ...ctx, i: ctx.i + 1 });
+}
+
+/* ---------- VILLÁMKÁRTYA ---------- */
+function vFlash() {
+  const ids = ctx.ids || allIds(), i = ctx.i || 0;
+  if (i >= ids.length) return `<div class="card center"><h1>Végigértél! 🃏</h1>
+    <button class="btn" style="margin-top:10px" onclick="nav('home')">Főoldal</button></div>`;
+  const c = byId(ids[i]);
+  return `
+  <div class="card tight sb">
+    <button class="btn ghost sm" onclick="nav('home')">✕</button>
+    <span class="tiny">${i + 1} / ${ids.length} · koppints a kártyára</span>
+  </div>
+  <div class="flip" id="flip" onclick="this.classList.toggle('on')">
+    <div class="flip-in">
+      <div class="face"><div class="center"><div class="tiny">Mi a meghatározása?</div>
+        <div class="concept-name" style="margin-top:10px">${esc(c.name)}</div></div></div>
+      <div class="face back"><div><div class="tiny">${esc(c.name)}</div>
+        <div style="margin-top:8px;font-size:15px">${esc(c.short)}</div>
+        <div class="blk tip" style="margin-top:12px"><div class="lbl">Tipp</div><div style="font-size:13.5px">${esc(c.tip)}</div></div>
+      </div></div>
+    </div>
+  </div>
+  <div class="grid2">
+    <button class="btn bad" onclick="flashAns(false)">Nem tudtam</button>
+    <button class="btn ok" onclick="flashAns(true)">Tudtam ✓</button>
+  </div>`;
+}
+function flashAns(ok) {
+  const ids = ctx.ids, i = ctx.i || 0;
+  grade(ids[i], ok); logDay('rev', 1);
+  nav('flash', { ids, i: i + 1 });
+}
+
+/* ---------- KVÍZ INDÍTÓ ---------- */
+function vQuizStart() {
+  return `
+  <div class="card">
+    <h1>🎯 Kvíz</h1>
+    <p class="muted">Minden kérdés a 72 fogalomból jön. Rossz válasznál megmutatja, mit választottál és miért nem az a jó.</p>
+    <button class="btn" onclick="nav('quizrun',{qs:buildQuiz(CONCEPTS,10),i:0,ok:0,title:'Vegyes kvíz'})">Vegyes kvíz (10 kérdés)</button>
+    <button class="btn sec" style="margin-top:8px" onclick="nav('quizrun',{qs:buildQuiz(weakList(),Math.min(10,weakList().length)),i:0,ok:0,title:'Gyenge pontok'})">Gyenge pontjaim (${weakList().length})</button>
+  </div>
+  ${MODULES.map(m => `
+  <div class="card tight sb">
+    <div><b>${m.emoji} ${m.num}. ${esc(m.title)}</b><div class="tiny">${modStats(m.id).total} fogalom</div></div>
+    <button class="btn sm sec" onclick="nav('quizrun',{qs:buildQuiz(CONCEPTS.filter(c=>c.m==='${m.id}'),10),i:0,ok:0,title:'${esc(m.title)}'})">Indít</button>
+  </div>`).join('')}`;
+}
+function weakList() {
+  const w = CONCEPTS.filter(c => { const k = S.cards[c.id]; return k.bad > 0 && k.box < 4; });
+  return w.length ? w : CONCEPTS.filter(c => (S.cards[c.id].box || 0) <= 1);
+}
+
+/* ---------- KVÍZ FUTÁS ---------- */
+function vQuizRun() {
+  const { qs, i, ok } = ctx;
+  if (!qs.length) return `<div class="card center"><h2>Nincs kérdés ebben a körben.</h2>
+    <button class="btn" style="margin-top:10px" onclick="nav('home')">Vissza</button></div>`;
+  if (i >= qs.length) {
+    const pct = Math.round(ok / qs.length * 100);
+    if (!ctx.counted) {
+      ctx.counted = true;
+      S.stats.qTotal += qs.length; S.stats.qOk += ok; logDay('q', qs.length);
+      if (pct === 100) addXP(20);
+      save(); checkBadges();
+    }
+    return `<div class="card center">
+      <h1>${pct >= 80 ? '🎉' : pct >= 50 ? '👍' : '💪'} ${ok} / ${qs.length}</h1>
+      <div class="concept-name">${pct}%</div>
+      <p class="muted">${pct === 100 ? 'Hibátlan! +20 bónusz XP.' : pct >= 80 ? 'Szép munka, már majdnem tökéletes.' : 'A hibás fogalmak visszakerültek az 1. dobozba, hamarosan újra kérdez rájuk az app.'}</p>
+      <button class="btn" style="margin-top:12px" onclick="nav('quiz')">Új kvíz</button>
+      <button class="btn sec" style="margin-top:8px" onclick="nav('home')">Főoldal</button>
+    </div>`;
+  }
+  const q = qs[i];
+  return `
+  <div class="card">
+    <div class="sb"><button class="btn ghost sm" onclick="nav('home')">✕</button>
+      <span class="tiny">${esc(ctx.title || 'Kvíz')} · ${i + 1}/${qs.length} · ${ok} jó</span></div>
+    <div class="prog" style="margin-top:12px"><i style="width:${i / qs.length * 100}%"></i></div>
+    <div class="q">${q.prompt}</div>
+    <div id="opts">${q.opts.map((o, k) => `<button class="opt" data-id="${o.id}" data-k="${k}">${esc(o.text)}</button>`).join('')}</div>
+    <div id="fb"></div>
+  </div>`;
+}
+function bindQuiz() {
+  const q = ctx.qs[ctx.i];
+  if (!q) return;
+  document.querySelectorAll('#opts .opt').forEach(btn => {
+    btn.onclick = () => {
+      const pickId = btn.dataset.id, good = pickId === q.cid;
+      const c = byId(q.cid), picked = byId(pickId);
+      document.querySelectorAll('#opts .opt').forEach(b => {
+        b.disabled = true;
+        if (b.dataset.id === q.cid) b.classList.add('right');
+        else if (b === btn) b.classList.add('wrong');
+      });
+      grade(q.cid, good);
+      if (view === 'quizrun') ctx.ok += good ? 1 : 0; else ctx.ok += good ? 1 : 0;
+      $('#fb').innerHTML = good
+        ? `<div class="fb good"><b>Helyes! ✅</b>${esc(c.tip)}</div>
+           <button class="btn" style="margin-top:10px" onclick="nextQ()">Tovább →</button>`
+        : `<div class="fb bad"><b>Nem ez az. ❌</b>
+             <div style="margin-bottom:8px"><b style="display:inline">Amit választottál (${esc(picked ? picked.name : '?')}):</b> ${esc(picked ? trim(picked.short, 170) : '')}</div>
+             <div><b style="display:inline">A helyes válasz (${esc(c.name)}):</b> ${esc(trim(c.short, 200))}</div>
+           </div>
+           <div class="fb good" style="margin-top:8px"><b>Hogy jegyezd meg</b>${esc(c.tip)}</div>
+           <button class="btn" style="margin-top:10px" onclick="nextQ()">Értem, tovább →</button>`;
+      $('#fb').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    };
+  });
+}
+function nextQ() {
+  ctx.i++;
+  if (view === 'examrun' && ctx.i >= ctx.qs.length) { finishExam(); return; }
+  render();
+  if (view === 'examrun') startExamTimerTick();
+}
+
+/* ---------- PRÓBAVIZSGA ---------- */
+function vExam() {
+  return `
+  <div class="card">
+    <h1>🎓 Próbavizsga</h1>
+    <p class="muted">30 kérdés mind a 72 fogalomból, 20 perc. A végén megkapod a pontszámot és a hibalistát.</p>
+    <div class="grid3" style="margin:12px 0">
+      <div class="stat"><b>${S.stats.examBest}%</b><span>legjobb</span></div>
+      <div class="stat"><b>${S.stats.examRuns}</b><span>próba</span></div>
+      <div class="stat"><b>${masteredCount()}/72</b><span>bevésve</span></div>
+    </div>
+    <button class="btn" onclick="startExam()">Vizsga indítása</button>
+    <p class="tiny" style="margin-top:10px">Tipp: csak akkor éri meg élesben, ha legalább 60 fogalom a 3. doboz felett van.</p>
+  </div>`;
+}
+let examEnd = null, examTimer = null;
+function startExam() {
+  examEnd = Date.now() + 20 * 60 * 1000;
+  S.stats.examRuns++; save();
+  nav('examrun', { qs: buildQuiz(CONCEPTS, 30), i: 0, ok: 0, title: 'Próbavizsga', wrong: [] });
+  startExamTimerTick();
+}
+function vExamRun() {
+  if (ctx.i >= ctx.qs.length) return vExamDone();
+  const base = vQuizRun();
+  return `<div class="card tight center" style="position:sticky;top:64px;z-index:30">
+    <b id="clock">20:00</b> <span class="tiny">hátralévő idő</span></div>` + base;
+}
+function startExamTimerTick() {
+  clearInterval(examTimer);
+  examTimer = setInterval(() => {
+    const el = $('#clock'); if (!el) return;
+    const left = Math.max(0, examEnd - Date.now());
+    const m = Math.floor(left / 60000), s = Math.floor(left % 60000 / 1000);
+    el.textContent = m + ':' + String(s).padStart(2, '0');
+    if (left <= 0) { clearInterval(examTimer); finishExam(); }
+  }, 500);
+}
+function finishExam() { clearInterval(examTimer); ctx.i = ctx.qs.length; render(); }
+function vExamDone() {
+  const pct = Math.round(ctx.ok / ctx.qs.length * 100);
+  if (!ctx.counted) {
+    ctx.counted = true;
+    if (pct > S.stats.examBest) S.stats.examBest = pct;
+    save(); checkBadges();
+  }
+  return `<div class="card center">
+    <h1>${pct >= 80 ? '🎓' : '📖'} ${ctx.ok} / ${ctx.qs.length}</h1>
+    <div class="concept-name">${pct}%</div>
+    <p class="muted">${pct >= 80 ? 'Ez vizsgaérett szint. Tartsd meg napi ismétléssel!' : pct >= 60 ? 'Jó alap, de a gyenge pontokat még vedd át.' : 'Még kell rá idő. Menj vissza a tervhez és a modulokhoz.'}</p>
+    <button class="btn" style="margin-top:12px" onclick="nav('quizrun',{qs:buildQuiz(weakList(),10),i:0,ok:0,title:'Gyenge pontok'})">Gyenge pontok gyakorlása</button>
+    <button class="btn sec" style="margin-top:8px" onclick="nav('home')">Főoldal</button>
+  </div>`;
+}
+
+/* ---------- TERV ---------- */
+function vPlan() {
+  const days = planDays(), t = todayStr();
+  return `
+  <div class="card">
+    <h1>🗓️ Tanulóterv</h1>
+    <p class="muted">Add meg a vizsga napját, és az app szétosztja a 72 fogalmat, plusz beütemezi az ismétléseket.</p>
+    <label class="tiny">Vizsga időpontja</label>
+    <input type="date" id="exd" value="${S.examDate}" onchange="setExam(this.value)">
+    <div class="grid3" style="margin-top:12px">
+      <div class="stat"><b>${days.length}</b><span>nap</span></div>
+      <div class="stat"><b>${Math.ceil(CONCEPTS.length / Math.max(1, days.length - 2))}</b><span>új / nap</span></div>
+      <div class="stat"><b>${learnedCount()}/72</b><span>elkezdve</span></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>Napi bontás</h3>
+    ${days.map(d => `
+      <div class="day ${d.date === t ? 'today' : (d.date < t ? 'done' : '')}">
+        <div class="daynum">${d.n}. nap</div>
+        <div style="flex:1;min-width:0">
+          <div class="sb"><b style="font-size:14px">${d.kind}</b><span class="tiny">${d.date.slice(5).replace('-', '.')}.</span></div>
+          ${d.newIds.length
+            ? `<div class="tiny">${d.newIds.length} új fogalom · ${esc(modOf(d.newIds[0].m).title)}</div>
+               <div>${d.newIds.slice(0, 6).map(c => `<span class="chip">${esc(c.name)}</span>`).join('')}${d.newIds.length > 6 ? `<span class="chip">+${d.newIds.length - 6}</span>` : ''}</div>`
+            : `<div class="tiny">${d.kind === 'próbavizsga' ? '30 kérdéses éles próba, 20 perc' : 'Minden fogalom átpörgetése villámkártyával'}</div>`}
+          <div class="tiny" style="margin-top:4px">+ az aznap esedékes ismétlések</div>
+        </div>
+      </div>`).join('')}
+  </div>
+  <div class="card">
+    <h3>Hogyan működik a napi rutin</h3>
+    <p class="muted">1. Új fogalmak átvétele a tanulókártyákon (magyarázat, példa, tipp).<br>
+    2. Azonnali ellenőrző kvíz a most tanultakból.<br>
+    3. Esedékes ismétlések: 1 nap, 2 nap, 4 nap, 8 nap, 16 nap múlva jön vissza egy fogalom, ha tudtad. Ha nem, visszaesik az elejére.<br>
+    4. Hetente egy próbavizsga.</p>
+    <p class="tiny">Ez a Leitner-dobozos módszer, ez a bizonyítottan leghatékonyabb fogalomtanulási rutin. Napi 20 perc többet ér, mint vizsga előtt este 4 óra.</p>
+  </div>`;
+}
+function setExam(v) { if (v) { S.examDate = v; save(); render(); } }
+
+/* ---------- HALADÁS ---------- */
+function vProg() {
+  const boxes = [0, 0, 0, 0, 0, 0];
+  CONCEPTS.forEach(c => boxes[S.cards[c.id].box || 0]++);
+  const acc = S.stats.qTotal ? Math.round(S.stats.qOk / S.stats.qTotal * 100) : 0;
+  return `
+  <div class="card">
+    <h1>📊 Haladás</h1>
+    <div class="grid3" style="margin:12px 0">
+      <div class="stat"><b>${S.xp}</b><span>összes XP</span></div>
+      <div class="stat"><b>${S.streak}</b><span>napos sorozat</span></div>
+      <div class="stat"><b>${acc}%</b><span>kvíz pontosság</span></div>
+    </div>
+    <div class="bar"><i style="width:${Math.round(masteredCount() / CONCEPTS.length * 100)}%"></i></div>
+    <div class="tiny" style="margin-top:6px">${masteredCount()} / ${CONCEPTS.length} fogalom tartósan bevésve (4. doboz felett)</div>
+  </div>
+  <div class="card">
+    <h3>Dobozok</h3>
+    <div class="grid3">
+      ${[0,1,2,3,4,5].map(b => `<div class="stat"><b>${boxes[b]}</b><span>${b === 0 ? 'nem látott' : b + '. doboz'}</span></div>`).join('')}
+    </div>
+  </div>
+  <div class="card">
+    <h3>Kitűzők</h3>
+    ${BADGES.map(b => `<span class="badge ${S.badges.includes(b.id) ? '' : 'off'}">${b.emoji} ${b.name}</span>`).join('')}
+  </div>
+  ${MODULES.map(m => { const list = CONCEPTS.filter(c => c.m === m.id); return `
+  <div class="card">
+    <h3>${m.emoji} ${m.num}. ${esc(m.title)}</h3>
+    <div class="clist">${list.map(c => { const k = S.cards[c.id]; return `
+      <div class="citem"><div class="box b${k.box || 0}">${k.box || '–'}</div>
+        <div style="flex:1">${esc(c.name)}</div>
+        <span class="tiny">${k.ok}/${k.seen || 0}</span></div>`; }).join('')}</div>
+  </div>`; }).join('')}
+  <div class="card">
+    <h3>Újrakezdés</h3>
+    <p class="tiny">Törli az összes haladást ezen az eszközön. Nem visszavonható.</p>
+    <button class="btn ghost" onclick="if(confirm('Biztosan törlöd az összes haladást?')){localStorage.removeItem(STORE);location.reload()}">Haladás törlése</button>
+  </div>`;
+}
+
+/* ---------- indulás ---------- */
+load();
+document.addEventListener('DOMContentLoaded', () => { render(); });
+if (document.readyState !== 'loading') render();
+
+</script>
+</body>
+</html>
